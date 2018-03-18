@@ -9751,6 +9751,128 @@ var _elm_lang$svg$Svg_Attributes$accumulate = _elm_lang$virtual_dom$VirtualDom$a
 var _elm_lang$svg$Svg_Attributes$accelerate = _elm_lang$virtual_dom$VirtualDom$attribute('accelerate');
 var _elm_lang$svg$Svg_Attributes$accentHeight = _elm_lang$virtual_dom$VirtualDom$attribute('accent-height');
 
+var _elm_lang$window$Native_Window = function()
+{
+
+var size = _elm_lang$core$Native_Scheduler.nativeBinding(function(callback)	{
+	callback(_elm_lang$core$Native_Scheduler.succeed({
+		width: window.innerWidth,
+		height: window.innerHeight
+	}));
+});
+
+return {
+	size: size
+};
+
+}();
+var _elm_lang$window$Window_ops = _elm_lang$window$Window_ops || {};
+_elm_lang$window$Window_ops['&>'] = F2(
+	function (task1, task2) {
+		return A2(
+			_elm_lang$core$Task$andThen,
+			function (_p0) {
+				return task2;
+			},
+			task1);
+	});
+var _elm_lang$window$Window$onSelfMsg = F3(
+	function (router, dimensions, state) {
+		var _p1 = state;
+		if (_p1.ctor === 'Nothing') {
+			return _elm_lang$core$Task$succeed(state);
+		} else {
+			var send = function (_p2) {
+				var _p3 = _p2;
+				return A2(
+					_elm_lang$core$Platform$sendToApp,
+					router,
+					_p3._0(dimensions));
+			};
+			return A2(
+				_elm_lang$window$Window_ops['&>'],
+				_elm_lang$core$Task$sequence(
+					A2(_elm_lang$core$List$map, send, _p1._0.subs)),
+				_elm_lang$core$Task$succeed(state));
+		}
+	});
+var _elm_lang$window$Window$init = _elm_lang$core$Task$succeed(_elm_lang$core$Maybe$Nothing);
+var _elm_lang$window$Window$size = _elm_lang$window$Native_Window.size;
+var _elm_lang$window$Window$width = A2(
+	_elm_lang$core$Task$map,
+	function (_) {
+		return _.width;
+	},
+	_elm_lang$window$Window$size);
+var _elm_lang$window$Window$height = A2(
+	_elm_lang$core$Task$map,
+	function (_) {
+		return _.height;
+	},
+	_elm_lang$window$Window$size);
+var _elm_lang$window$Window$onEffects = F3(
+	function (router, newSubs, oldState) {
+		var _p4 = {ctor: '_Tuple2', _0: oldState, _1: newSubs};
+		if (_p4._0.ctor === 'Nothing') {
+			if (_p4._1.ctor === '[]') {
+				return _elm_lang$core$Task$succeed(_elm_lang$core$Maybe$Nothing);
+			} else {
+				return A2(
+					_elm_lang$core$Task$andThen,
+					function (pid) {
+						return _elm_lang$core$Task$succeed(
+							_elm_lang$core$Maybe$Just(
+								{subs: newSubs, pid: pid}));
+					},
+					_elm_lang$core$Process$spawn(
+						A3(
+							_elm_lang$dom$Dom_LowLevel$onWindow,
+							'resize',
+							_elm_lang$core$Json_Decode$succeed(
+								{ctor: '_Tuple0'}),
+							function (_p5) {
+								return A2(
+									_elm_lang$core$Task$andThen,
+									_elm_lang$core$Platform$sendToSelf(router),
+									_elm_lang$window$Window$size);
+							})));
+			}
+		} else {
+			if (_p4._1.ctor === '[]') {
+				return A2(
+					_elm_lang$window$Window_ops['&>'],
+					_elm_lang$core$Process$kill(_p4._0._0.pid),
+					_elm_lang$core$Task$succeed(_elm_lang$core$Maybe$Nothing));
+			} else {
+				return _elm_lang$core$Task$succeed(
+					_elm_lang$core$Maybe$Just(
+						{subs: newSubs, pid: _p4._0._0.pid}));
+			}
+		}
+	});
+var _elm_lang$window$Window$subscription = _elm_lang$core$Native_Platform.leaf('Window');
+var _elm_lang$window$Window$Size = F2(
+	function (a, b) {
+		return {width: a, height: b};
+	});
+var _elm_lang$window$Window$MySub = function (a) {
+	return {ctor: 'MySub', _0: a};
+};
+var _elm_lang$window$Window$resizes = function (tagger) {
+	return _elm_lang$window$Window$subscription(
+		_elm_lang$window$Window$MySub(tagger));
+};
+var _elm_lang$window$Window$subMap = F2(
+	function (func, _p6) {
+		var _p7 = _p6;
+		return _elm_lang$window$Window$MySub(
+			function (_p8) {
+				return func(
+					_p7._0(_p8));
+			});
+	});
+_elm_lang$core$Native_Platform.effectManagers['Window'] = {pkg: 'elm-lang/window', init: _elm_lang$window$Window$init, onEffects: _elm_lang$window$Window$onEffects, onSelfMsg: _elm_lang$window$Window$onSelfMsg, tag: 'sub', subMap: _elm_lang$window$Window$subMap};
+
 var _user$project$Main$radioStyle = _elm_lang$html$Html_Attributes$style(
 	{
 		ctor: '::',
@@ -10187,16 +10309,29 @@ var _user$project$Main$gameView = function (model) {
 				_elm_lang$svg$Svg$svg,
 				{
 					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$width(
-						_elm_lang$core$Basics$toString(_user$project$Main$svWidth)),
+					_0: _elm_lang$html$Html_Attributes$style(
+						{
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'margin', _1: 'auto'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'display', _1: 'block'},
+								_1: {ctor: '[]'}
+							}
+						}),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$height(
-							_elm_lang$core$Basics$toString(_user$project$Main$svHeight)),
+						_0: _elm_lang$svg$Svg_Attributes$width(
+							_elm_lang$core$Basics$toString(model.winW - 50)),
 						_1: {
 							ctor: '::',
-							_0: vBox,
-							_1: {ctor: '[]'}
+							_0: _elm_lang$svg$Svg_Attributes$height(
+								_elm_lang$core$Basics$toString(model.winH - 50)),
+							_1: {
+								ctor: '::',
+								_0: vBox,
+								_1: {ctor: '[]'}
+							}
 						}
 					}
 				},
@@ -10290,7 +10425,20 @@ var _user$project$Main$gameView = function (model) {
 				ctor: '::',
 				_0: A2(
 					_elm_lang$html$Html$div,
-					{ctor: '[]'},
+					{
+						ctor: '::',
+						_0: _elm_lang$html$Html_Attributes$style(
+							{
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'position', _1: 'relative'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'top', _1: '-30px'},
+									_1: {ctor: '[]'}
+								}
+							}),
+						_1: {ctor: '[]'}
+					},
 					{
 						ctor: '::',
 						_0: _elm_lang$html$Html$text(
@@ -10337,33 +10485,12 @@ var _user$project$Main$Feed = F4(
 var _user$project$Main$PImage = function (a) {
 	return {source: a};
 };
-var _user$project$Main$Model = F7(
-	function (a, b, c, d, e, f, g) {
-		return {x: a, y: b, name: c, feed: d, size: e, display: f, inGame: g};
+var _user$project$Main$Model = F9(
+	function (a, b, c, d, e, f, g, h, i) {
+		return {x: a, y: b, winH: c, winW: d, name: e, feed: f, size: g, display: h, inGame: i};
 	});
 var _user$project$Main$LS = function (a) {
 	return {ctor: 'LS', _0: a};
-};
-var _user$project$Main$init = {
-	ctor: '_Tuple2',
-	_0: {
-		x: _elm_lang$core$Basics$round(
-			_elm_lang$core$Basics$toFloat(_user$project$Main$svWidth) / 2),
-		y: _elm_lang$core$Basics$round(
-			_elm_lang$core$Basics$toFloat(_user$project$Main$svHeight) / 2),
-		name: 'unknown',
-		feed: {ctor: '[]'},
-		size: 25,
-		display: _user$project$Main$LS('red'),
-		inGame: false
-	},
-	_1: _elm_lang$core$Platform_Cmd$none
-};
-var _user$project$Main$resetGame = function (model) {
-	var initial = _user$project$Main$extractMod(_user$project$Main$init);
-	return _elm_lang$core$Native_Utils.update(
-		model,
-		{x: initial.x, y: initial.y, feed: initial.feed, size: initial.size, inGame: false});
 };
 var _user$project$Main$RS = function (a) {
 	return {ctor: 'RS', _0: a};
@@ -10378,6 +10505,32 @@ var _user$project$Main$updatePlayerDisplay = F2(
 				{source: _p14._0});
 		}
 	});
+var _user$project$Main$UpdateWinSize = function (a) {
+	return {ctor: 'UpdateWinSize', _0: a};
+};
+var _user$project$Main$init = {
+	ctor: '_Tuple2',
+	_0: {
+		x: _elm_lang$core$Basics$round(
+			_elm_lang$core$Basics$toFloat(_user$project$Main$svWidth) / 2),
+		y: _elm_lang$core$Basics$round(
+			_elm_lang$core$Basics$toFloat(_user$project$Main$svHeight) / 2),
+		winH: 0,
+		winW: 0,
+		name: 'unknown',
+		feed: {ctor: '[]'},
+		size: 25,
+		display: _user$project$Main$LS('red'),
+		inGame: false
+	},
+	_1: A2(_elm_lang$core$Task$perform, _user$project$Main$UpdateWinSize, _elm_lang$window$Window$size)
+};
+var _user$project$Main$resetGame = function (model) {
+	var initial = _user$project$Main$extractMod(_user$project$Main$init);
+	return _elm_lang$core$Native_Utils.update(
+		model,
+		{x: initial.x, y: initial.y, feed: initial.feed, size: initial.size, inGame: false});
+};
 var _user$project$Main$StartG = {ctor: 'StartG'};
 var _user$project$Main$NameUpdate = function (a) {
 	return {ctor: 'NameUpdate', _0: a};
@@ -10635,7 +10788,7 @@ var _user$project$Main$genRand = A2(
 var _user$project$Main$update = F2(
 	function (msg, model) {
 		var _p16 = msg;
-		_v31_13:
+		_v31_14:
 		do {
 			switch (_p16.ctor) {
 				case 'KeyMsg':
@@ -10759,7 +10912,7 @@ var _user$project$Main$update = F2(
 								_1: _elm_lang$core$Platform_Cmd$none
 							};
 						default:
-							break _v31_13;
+							break _v31_14;
 					}
 				case 'DispUpdate':
 					return {
@@ -10787,6 +10940,15 @@ var _user$project$Main$update = F2(
 							{inGame: true}),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
+				case 'UpdateWinSize':
+					var _p17 = _p16._0;
+					return {
+						ctor: '_Tuple2',
+						_0: _elm_lang$core$Native_Utils.update(
+							model,
+							{winH: _p17.height, winW: _p17.width}),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
 				default:
 					if (_p16._0.ctor === '_Tuple2') {
 						return (_elm_lang$core$Native_Utils.cmp(
@@ -10797,7 +10959,7 @@ var _user$project$Main$update = F2(
 							_1: _elm_lang$core$Platform_Cmd$none
 						} : {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 					} else {
-						break _v31_13;
+						break _v31_14;
 					}
 			}
 		} while(false);
@@ -10807,9 +10969,18 @@ var _user$project$Main$KeyMsg = function (a) {
 	return {ctor: 'KeyMsg', _0: a};
 };
 var _user$project$Main$subscriptions = function (model) {
-	var _p17 = model.inGame;
-	if (_p17 === true) {
-		return _elm_lang$keyboard$Keyboard$downs(_user$project$Main$KeyMsg);
+	var _p18 = model.inGame;
+	if (_p18 === true) {
+		return _elm_lang$core$Platform_Sub$batch(
+			{
+				ctor: '::',
+				_0: _elm_lang$keyboard$Keyboard$downs(_user$project$Main$KeyMsg),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$window$Window$resizes(_user$project$Main$UpdateWinSize),
+					_1: {ctor: '[]'}
+				}
+			});
 	} else {
 		return _elm_lang$core$Platform_Sub$none;
 	}

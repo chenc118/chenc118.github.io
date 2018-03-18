@@ -9,6 +9,8 @@ import Keyboard as Key
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Random exposing (..)
+import Window exposing (..)
+import Task exposing (..)
 
 --a highly simplified version of agar.io, not going to bother with the time needed to make the background scroll and other stuff
 
@@ -22,6 +24,7 @@ type alias Display = Either PImage String -- can be one or the other, need to ex
 type alias PImage = {source:String} -- basic stuff needed to model the player image
 
 type alias Model = {x:Int, y:Int,
+                    winH: Int, winW:Int,
                     name:String,
                     feed: FeedBit,
                     size:Float,
@@ -29,19 +32,20 @@ type alias Model = {x:Int, y:Int,
                     inGame:Bool} -- list of records representing the different dots etc
 type alias DUpdate = Either String String --either holds info on whether it came for URL input or radio button input
 
-type Msg = KeyMsg Key.KeyCode | RandResult (Int,Int) | DispUpdate DUpdate |NameUpdate String | StartG
+type Msg = KeyMsg Key.KeyCode | RandResult (Int,Int) | DispUpdate DUpdate |NameUpdate String | StartG | UpdateWinSize Window.Size
 
 
 init : (Model, Cmd.Cmd Msg)
 init = ({x=round<| (toFloat svWidth)/2,
         y=round <| (toFloat svHeight)/2,
+        winH = 0, winW = 0,
         name="unknown",
         feed=[],
         size=25,-- set size to a really big number to see - infinity
         display = LS "red",
         inGame=False
     }
-    , Cmd.none)
+    , Task.perform UpdateWinSize Window.size)
 
 
 extractMod : (Model, Cmd.Cmd Msg) -> Model
@@ -213,6 +217,7 @@ update msg model = case msg of --wasd
             (DispUpdate u) -> ({model | display = updatePlayerDisplay u model.display},Cmd.none)
             (NameUpdate s) -> ({model | name = s},Cmd.none)
             (StartG)       -> ({model | inGame = True},Cmd.none)
+            (UpdateWinSize s) -> ({model | winH = s.height, winW = s.width},Cmd.none)
             (RandResult (a,b)) -> if (List.length model.feed < 100)  --limit so there's an upper bound to the size
                                 then (genFeed a b model,Cmd.none) 
                                 else (model,Cmd.none)
@@ -223,7 +228,7 @@ genRand = generate RandResult (Random.pair (int 1 10 ) (int 1 (svWidth*svHeight)
 
 gameView : Model -> Html Msg -- view used for when the game is being played
 gameView model = 
-    let 
+    let     
         posX = (toString model.x)
         posY = (toString model.y)
         feeds = buildFeeds model.feed
@@ -236,7 +241,7 @@ gameView model =
         vBox = genViewBox (mr <| round <| model.size) (model.x,model.y)
         gridlines = drawLines
     in div[][
-        svg[Svg.Attributes.width (toString svWidth),Svg.Attributes.height (toString svHeight),vBox](
+        svg[Html.Attributes.style[("margin","auto"),("display","block")],Svg.Attributes.width (toString <|model.winW-50),Svg.Attributes.height (toString <|model.winH-50),vBox](
             [--image in svg based on this https://stackoverflow.com/questions/29442833/svg-image-inside-circle
             defs [][
                 Svg.pattern[Svg.Attributes.id "player", x "0%", y "0%", Svg.Attributes.height "100%", Svg.Attributes.width "100%", viewBox "0 0 5000 5000"][
@@ -244,7 +249,7 @@ gameView model =
                     ]
                 ]
             ]++gridlines++feeds++[Svg.circle [cx posX,cy posY, r (toString <| mr <| round model.size),fill pfill, stroke "black", Svg.Attributes.strokeWidth "1px"] []])
-        ,div[][Html.text ("Score "++(toString <|round<| model.size-25))]
+        ,div[Html.Attributes.style[("position","relative"),("top","-30px")]][Html.text ("Score "++(toString <|round<| model.size-25))]
         ]
 
 
@@ -283,7 +288,7 @@ view model = case model.inGame of
 
 subscriptions : Model -> Sub.Sub Msg
 subscriptions model = case model.inGame of
-    True -> Key.downs KeyMsg -- only need keys during game
+    True -> Sub.batch[Key.downs KeyMsg,Window.resizes UpdateWinSize] -- only need keys during game
     False -> Sub.none --- listens to nothing due to nothing going on pre game
 
 main : Program Never Model Msg
