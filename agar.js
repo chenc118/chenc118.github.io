@@ -10302,7 +10302,24 @@ var _user$project$Main$gameView = function (model) {
 	var posX = _elm_lang$core$Basics$toString(model.x);
 	return A2(
 		_elm_lang$html$Html$div,
-		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$style(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'margin', _1: '0'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'padding', _1: '0'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'overflow', _1: 'hidden'},
+							_1: {ctor: '[]'}
+						}
+					}
+				}),
+			_1: {ctor: '[]'}
+		},
 		{
 			ctor: '::',
 			_0: A2(
@@ -10312,27 +10329,29 @@ var _user$project$Main$gameView = function (model) {
 					_0: _elm_lang$html$Html_Attributes$style(
 						{
 							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'margin', _1: 'auto'},
+							_0: {ctor: '_Tuple2', _0: 'position', _1: 'fixed'},
 							_1: {
 								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'display', _1: 'block'},
-								_1: {ctor: '[]'}
+								_0: {ctor: '_Tuple2', _0: 'top', _1: '0'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'left', _1: '0'},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'height', _1: '100%'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'width', _1: '100%'},
+											_1: {ctor: '[]'}
+										}
+									}
+								}
 							}
 						}),
 					_1: {
 						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$width(
-							_elm_lang$core$Basics$toString(model.winW - 50)),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$height(
-								_elm_lang$core$Basics$toString(model.winH - 50)),
-							_1: {
-								ctor: '::',
-								_0: vBox,
-								_1: {ctor: '[]'}
-							}
-						}
+						_0: vBox,
+						_1: {ctor: '[]'}
 					}
 				},
 				A2(
@@ -10430,23 +10449,46 @@ var _user$project$Main$gameView = function (model) {
 						_0: _elm_lang$html$Html_Attributes$style(
 							{
 								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'position', _1: 'relative'},
+								_0: {ctor: '_Tuple2', _0: 'position', _1: 'fixed'},
 								_1: {
 									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'top', _1: '-30px'},
-									_1: {ctor: '[]'}
+									_0: {ctor: '_Tuple2', _0: 'bottom', _1: '1%'},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'left', _1: '1%'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'color', _1: 'white'},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'darkgrey'},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'opacity', _1: '0.7'},
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									}
 								}
 							}),
 						_1: {ctor: '[]'}
 					},
 					{
 						ctor: '::',
-						_0: _elm_lang$html$Html$text(
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								'Score ',
-								_elm_lang$core$Basics$toString(
-									_elm_lang$core$Basics$round(model.size - 25)))),
+						_0: A2(
+							_elm_lang$html$Html$strong,
+							{ctor: '[]'},
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html$text(
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										'Score: ',
+										_elm_lang$core$Basics$toString(
+											_elm_lang$core$Basics$round(model.size - 25)))),
+								_1: {ctor: '[]'}
+							}),
 						_1: {ctor: '[]'}
 					}),
 				_1: {ctor: '[]'}
@@ -10751,7 +10793,7 @@ var _user$project$Main$preView = function (model) {
 														{ctor: '[]'},
 														{
 															ctor: '::',
-															_0: _elm_lang$html$Html$text('The goal is eat smaller dots and grow. The goal is to get to 2000 points'),
+															_0: _elm_lang$html$Html$text('The goal is eat smaller dots and grow. Try to get to 2000 points, and as a really really difficult challenge 2300'),
 															_1: {ctor: '[]'}
 														}),
 													_1: {ctor: '[]'}

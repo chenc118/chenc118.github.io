@@ -240,8 +240,8 @@ gameView model =
             (RS r) -> image [x "0%",y "0%",Svg.Attributes.height "5000",Svg.Attributes.width "5000",Svg.Attributes.xlinkHref r.source][]
         vBox = genViewBox (mr <| round <| model.size) (model.x,model.y)
         gridlines = drawLines
-    in div[][
-        svg[Html.Attributes.style[("margin","auto"),("display","block")],Svg.Attributes.width (toString <|model.winW-50),Svg.Attributes.height (toString <|model.winH-50),vBox](
+    in div[Html.Attributes.style[("margin","0"),("padding","0"),("overflow","hidden")]][-- fixed positioning of SVG https://stackoverflow.com/questions/5643254/how-to-scale-svg-image-to-fill-browser-window
+        svg[Html.Attributes.style[("position","fixed"),("top","0"),("left","0"),("height","100%"),("width","100%")],vBox](
             [--image in svg based on this https://stackoverflow.com/questions/29442833/svg-image-inside-circle
             defs [][
                 Svg.pattern[Svg.Attributes.id "player", x "0%", y "0%", Svg.Attributes.height "100%", Svg.Attributes.width "100%", viewBox "0 0 5000 5000"][
@@ -249,7 +249,9 @@ gameView model =
                     ]
                 ]
             ]++gridlines++feeds++[Svg.circle [cx posX,cy posY, r (toString <| mr <| round model.size),fill pfill, stroke "black", Svg.Attributes.strokeWidth "1px"] []])
-        ,div[Html.Attributes.style[("position","relative"),("top","-30px")]][Html.text ("Score "++(toString <|round<| model.size-25))]
+        ,div[Html.Attributes.style[("position","fixed"),("bottom","1%"),("left","1%"),("color","white"),("background-color","darkgrey"),("opacity","0.7")]][
+            strong[][Html.text ("Score: "++(toString <|round<| model.size-25))]
+            ]
         ]
 
 
@@ -277,7 +279,7 @@ preView model =
         ,div[][
             strong[][Html.text "Instructions:"]
             ,p[][Html.text "Use the arrow keys or WASD to move the circle around"]
-            ,p[][Html.text "The goal is eat smaller dots and grow. The goal is to get to 2000 points"]
+            ,p[][Html.text "The goal is eat smaller dots and grow. Try to get to 2000 points, and as a really really difficult challenge 2300"]
             ]
     ]
 
