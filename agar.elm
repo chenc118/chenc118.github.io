@@ -38,6 +38,9 @@ type alias Model = {x:Float, y:Float,
                     display:Display,
                     control:Control,
                     rng:RNG,
+                    fps:Bool,
+                    tickFrames:{first:Float,count:Int},--stuff to get the FPS aka ticks/second
+                    tickRate:Float,
                     inGame:Bool} -- list of records representing the different dots etc
 type alias DUpdate = Either String String --either holds info on whether it came for URL input or radio button input
 
@@ -49,6 +52,7 @@ type Msg = KeyMsg Key.KeyCode
             | UpdateWinSize Window.Size
             | Tick Float
             | MouseMsg Mouse.Position
+            | ToggleFPS
 
 
 init : (Model, Cmd.Cmd Msg)
@@ -62,6 +66,9 @@ init = ({x=(toFloat svWidth)/2,
         control=Mouse,
         display = LS "red",
         rng = {range = 50, regChance=1, superChance=0,limit=100},
+        fps = True,
+        tickFrames={first=0,count=0},-- debug for animation tickRate
+        tickRate=0,
         inGame=False
     }
     , Task.perform UpdateWinSize Window.size)
@@ -106,7 +113,7 @@ scCenter model = let
         x = toFloat model.winW
         y = toFloat model.winH
     in ((x/2),(y/2))
-
+{-
 --takes boundary, position
 boundsCheck : Int -> Float ->Float -> Float
 boundsCheck b pos rad = let 
@@ -117,6 +124,19 @@ boundsCheck b pos rad = let
                             pos + bounds+(2*rad)
                         else
                             pos
+-}
+--alt boundary check
+boundsCheck : Int -> Float -> Float -> Float
+boundsCheck b pos rad = let
+                            bounds = toFloat b
+                        in if pos>bounds then 
+                            bounds
+                        else if pos<0 then 
+                            0
+                        else 
+                            pos
+
+
 
 genViewBox : Float -> (Float,Float)->Svg.Attribute msg
 genViewBox rad (x,y)= let
@@ -183,12 +203,13 @@ testConsume model = let
         feeds = model.feed
         consumed = List.map (canConsume (mr model.size) model.x model.y) feeds -- messy mapping stuff to produce a boolean list
         both = wrap consumed feeds --wrap the two together lazily in a tuple
-    in {model | feed = filterOut both [], size = shrink <|consume both model.size}--update model
+    in {model | feed = List.reverse <|filterOut both [], size = shrink <|consume both model.size}--update model
 
 shrink:Float -> Float
 --shrink size = size - (sqrt ((size-25) /10000000) ) -- basically shrink faster if larger, though at a slower rate, pretty much grow forever like this
 --shrink size = size - (((size*size)-625) / 10000000) --shrink really fast when big, constant gen max ~ 2236 (can get higher if you game it), rng god gen max about 70711
 shrink size = size - (((size*size)-625) / 50000000) --shrink really fast when big, constant gen max ~ 2236 (can get higher if you game it), rng god gen max about 70711
+
 --lazy wrapping cause seriously no way to do this kind of thing without going into a bunch of messy case x of and Maybes
 --Also the two lists should be the same size in the usage scenario
 wrap : List a -> List b -> List (a,b)
@@ -246,6 +267,16 @@ genColor x = let
                 12 -> "brown"
                 _ -> "white" -- the devil's dot, aka it can't be seen
 
+tick : Float -> Model -> Model
+tick tick model = let
+        frames = model.tickFrames 
+
+    in  if frames.count == 0 then 
+            {model | tickFrames = {frames | first=tick,count=frames.count+1}}
+        else if frames.count >= 20 then
+            {model | tickRate = 20000 / (tick-frames.first), tickFrames = {frames | count=0}}
+        else 
+            {model | tickFrames = {frames | count=frames.count+1}}
 
 updatePlayerDisplay: DUpdate -> Display
 updatePlayerDisplay du = case du of 
@@ -275,14 +306,15 @@ update msg model = let
                                 _  -> (model,Cmd.none)
             (Tick t) -> if model.control==Mouse then let
                                                     (dx,dy) = mouseSpeed (scCenter model) (model.mx,model.my) 2
-                                                in (testConsume {model| 
+                                                in (tick t <|testConsume {model| 
                                                     x = (bCheckx (model.x+dx) model.size), 
                                                     y = (bChecky (model.y+dy) model.size)},rand)
-                                            else (model,Cmd.none)
+                                            else (tick t model,Cmd.none)
             (MouseMsg pos) -> {model| mx = pos.x,my=pos.y}![]
             (DispUpdate u) -> ({model | display = updatePlayerDisplay u},Cmd.none)
             (NameUpdate s) -> ({model | name = s},Cmd.none)
             (StartG)       -> ({model | inGame = True},Cmd.none)
+            (ToggleFPS)    -> {model | fps = Basics.not model.fps} ![]
             (UpdateWinSize s) -> ({model | winH = s.height, winW = s.width},Cmd.none)
             (RandResult (a,b)) -> if (List.length model.feed < rng.limit)  --limit so there's an upper bound to the size, over 1000 it starts getting slow
                                 then (genFeed rng a b model,Cmd.none) 
@@ -320,12 +352,12 @@ gameView model =
             ++feeds
             ++[Svg.circle [cx posX,cy posY, r (toString <| mr model.size),fill pfill, stroke "black", Svg.Attributes.strokeWidth "1px"] []]
             ++[Svg.text_ [x posX, y posY, Svg.Attributes.textAnchor "middle",Svg.Attributes.alignmentBaseline "middle", Html.Attributes.style [
-                    ("font-size",(toString <|( mr model.size)/2)++"px")
+                    ("font-size",(toString <|( mr model.size)/2)++"px")-- dynamic scaling of text wrt size
                     ,("font-weight","bold")
                     ,("fill","white")
                     ,("fill-opacity","1")
                     ,("stroke","#000")
-                    ,("stroke-width",(toString <| (mr model.size)/50)++"px")
+                    ,("stroke-width",(toString <| (mr model.size)/50)++"px")-- dynamic scaling of text wrt to size
                     ,("stroke-linecap","butt")
                     ,("stroke-linejoin","miter")
                     ,("stroke-opacity","1")
@@ -337,34 +369,51 @@ gameView model =
         ,div[Html.Attributes.style[("position","fixed"),("bottom","1%"),("left","1%"),("color","white"),("background-color","darkgrey"),("opacity","0.7")]][
             strong[][Html.text ("Score: "++(toString <|round<| model.size-25))]
             ]
+        ,div[Html.Attributes.hidden (not model.fps), Html.Attributes.style[("position","fixed"),("top","1%"),("left","1%"),("color","white"),("background-color","darkgrey"),("opacity","0.7")]][
+            strong[][Html.text ("FPS: "++(toString <|round<| model.tickRate))]
+            ]
         ]
 
 
 
 radioStyle = Html.Attributes.style[("clear","both"),("margin","auto"),("text-align","unset")]
 
-radioButton : String -> Html Msg
-radioButton color = label[radioStyle][input[Html.Attributes.type_ "radio",Html.Attributes.name "colorPick",onClick (DispUpdate (LS color))][],Html.text color]
+radioButton : String -> String -> Html Msg
+radioButton color current= label[radioStyle][
+            input[Html.Attributes.checked (color==current)
+                ,Html.Attributes.type_ "radio"
+                ,Html.Attributes.name "colorPick"
+                ,onClick (DispUpdate (LS color))][]
+            ,Html.text color
+        ]
 
 preView : Model -> Html Msg
 preView model = 
     let 
-        n = ""
+        current = case model.display of
+                (LS s) -> s
+                (RS s) -> ""
+        img = case model.display of
+                (LS s) -> ""
+                (RS s) -> s.source
     in div [Html.Attributes.style[("margin","auto"),("text-align","center"),("height","80%"),("width","80%"),("background-color","lightgrey")]][
         div[][Html.text "Enter your name"]
-        ,div[][Html.input [Html.Attributes.placeholder "unknown name", Html.Events.onInput (\inp -> NameUpdate inp),radioStyle][]]
+        ,div[][Html.input [Html.Attributes.placeholder "name", Html.Events.onInput (\inp -> NameUpdate inp),radioStyle, Html.Attributes.value model.name][]]
         ,div [][Html.text "Enter the url for the image or choose a color from below"]
-        ,div[][input [Html.Attributes.placeholder "Input Image URL", onInput (\inp ->DispUpdate (RS inp)),radioStyle][]]
+        ,div[][input [Html.Attributes.placeholder "Input Image URL", onInput (\inp ->DispUpdate (RS inp)),radioStyle, Html.Attributes.value img][]]
         ,div[][--div holding a bunch of stuff relating to the color
-            radioButton "red",
-            radioButton "blue",
-            radioButton "green"
+            radioButton "red" current,
+            radioButton "blue" current,
+            radioButton "green" current
             ]
         ,div[][button[Html.Attributes.style [("background-color","green"),("color","white")],Html.Events.onClick StartG][Html.text "Start"]]
         ,div[][
             strong[][Html.text "Instructions:"]
             ,p[][Html.text "Use the mouse move the circle around, press ESC to quit the game at any time"]
             ,p[][Html.text "The goal is eat smaller dots and grow. Try to get to 2000 points, and as a really really difficult challenge 2300"]
+            ]
+        ,div[][
+            label [][input [Html.Attributes.type_ "checkbox", Html.Attributes.checked model.fps, onClick ToggleFPS][], Html.text "FPS"]
             ]
     ]
 
@@ -375,9 +424,16 @@ view model = case model.inGame of
 
 subscriptions : Model -> Sub.Sub Msg
 subscriptions model = let
-        ani = if model.control==Mouse then [Anim.times Tick,Mouse.moves MouseMsg] else []
+        mice = if model.control==Mouse then 
+                    [Mouse.moves MouseMsg] 
+               else 
+                    []
+        ani = if model.control==Mouse || model.fps then 
+                    [Anim.times Tick] 
+              else 
+                    []
     in case model.inGame of
-    True -> Sub.batch([Key.downs KeyMsg,Window.resizes UpdateWinSize]++ani) -- only need keys during game
+    True -> Sub.batch([Key.downs KeyMsg,Window.resizes UpdateWinSize]++ani++mice) -- only need keys during game
     False -> Sub.none --- listens to nothing due to nothing going on pre game
 
 main : Program Never Model Msg

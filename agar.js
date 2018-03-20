@@ -10235,6 +10235,30 @@ var _user$project$Main$radioStyle = _elm_lang$html$Html_Attributes$style(
 			}
 		}
 	});
+var _user$project$Main$tick = F2(
+	function (tick, model) {
+		var frames = model.tickFrames;
+		return _elm_lang$core$Native_Utils.eq(frames.count, 0) ? _elm_lang$core$Native_Utils.update(
+			model,
+			{
+				tickFrames: _elm_lang$core$Native_Utils.update(
+					frames,
+					{first: tick, count: frames.count + 1})
+			}) : ((_elm_lang$core$Native_Utils.cmp(frames.count, 20) > -1) ? _elm_lang$core$Native_Utils.update(
+			model,
+			{
+				tickRate: 20000 / (tick - frames.first),
+				tickFrames: _elm_lang$core$Native_Utils.update(
+					frames,
+					{count: 0})
+			}) : _elm_lang$core$Native_Utils.update(
+			model,
+			{
+				tickFrames: _elm_lang$core$Native_Utils.update(
+					frames,
+					{count: frames.count + 1})
+			}));
+	});
 var _user$project$Main$genColor = function (x) {
 	var y = A2(_elm_lang$core$Basics_ops['%'], x, 14);
 	var _p0 = y;
@@ -10522,10 +10546,11 @@ var _user$project$Main$testConsume = function (model) {
 	return _elm_lang$core$Native_Utils.update(
 		model,
 		{
-			feed: A2(
-				_user$project$Main$filterOut,
-				both,
-				{ctor: '[]'}),
+			feed: _elm_lang$core$List$reverse(
+				A2(
+					_user$project$Main$filterOut,
+					both,
+					{ctor: '[]'})),
 			size: _user$project$Main$shrink(
 				A2(_user$project$Main$consume, both, model.size))
 		});
@@ -10953,14 +10978,70 @@ var _user$project$Main$gameView = function (model) {
 							}),
 						_1: {ctor: '[]'}
 					}),
-				_1: {ctor: '[]'}
+				_1: {
+					ctor: '::',
+					_0: A2(
+						_elm_lang$html$Html$div,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$hidden(!model.fps),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$style(
+									{
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'position', _1: 'fixed'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'top', _1: '1%'},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'left', _1: '1%'},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'color', _1: 'white'},
+													_1: {
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'darkgrey'},
+														_1: {
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: 'opacity', _1: '0.7'},
+															_1: {ctor: '[]'}
+														}
+													}
+												}
+											}
+										}
+									}),
+								_1: {ctor: '[]'}
+							}
+						},
+						{
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$strong,
+								{ctor: '[]'},
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html$text(
+										A2(
+											_elm_lang$core$Basics_ops['++'],
+											'FPS: ',
+											_elm_lang$core$Basics$toString(
+												_elm_lang$core$Basics$round(model.tickRate)))),
+									_1: {ctor: '[]'}
+								}),
+							_1: {ctor: '[]'}
+						}),
+					_1: {ctor: '[]'}
+				}
 			}
 		});
 };
 var _user$project$Main$boundsCheck = F3(
 	function (b, pos, rad) {
 		var bounds = _elm_lang$core$Basics$toFloat(b);
-		return (_elm_lang$core$Native_Utils.cmp(pos, bounds + rad) > -1) ? ((pos - bounds) - (2 * rad)) : ((_elm_lang$core$Native_Utils.cmp(pos, 0 - rad) < 1) ? ((pos + bounds) + (2 * rad)) : pos);
+		return (_elm_lang$core$Native_Utils.cmp(pos, bounds) > 0) ? bounds : ((_elm_lang$core$Native_Utils.cmp(pos, 0) < 0) ? 0 : pos);
 	});
 var _user$project$Main$bCheckx = F2(
 	function (pos, size) {
@@ -11037,7 +11118,13 @@ var _user$project$Main$Model = function (a) {
 										return function (k) {
 											return function (l) {
 												return function (m) {
-													return {x: a, y: b, mx: c, my: d, winH: e, winW: f, name: g, feed: h, size: i, display: j, control: k, rng: l, inGame: m};
+													return function (n) {
+														return function (o) {
+															return function (p) {
+																return {x: a, y: b, mx: c, my: d, winH: e, winW: f, name: g, feed: h, size: i, display: j, control: k, rng: l, fps: m, tickFrames: n, tickRate: o, inGame: p};
+															};
+														};
+													};
 												};
 											};
 										};
@@ -11068,6 +11155,7 @@ var _user$project$Main$updatePlayerDisplay = function (du) {
 };
 var _user$project$Main$Keys = {ctor: 'Keys'};
 var _user$project$Main$Mouse = {ctor: 'Mouse'};
+var _user$project$Main$ToggleFPS = {ctor: 'ToggleFPS'};
 var _user$project$Main$MouseMsg = function (a) {
 	return {ctor: 'MouseMsg', _0: a};
 };
@@ -11092,6 +11180,9 @@ var _user$project$Main$init = {
 		control: _user$project$Main$Mouse,
 		display: _user$project$Main$LS('red'),
 		rng: {range: 50, regChance: 1, superChance: 0, limit: 100},
+		fps: true,
+		tickFrames: {first: 0, count: 0},
+		tickRate: 0,
 		inGame: false
 	},
 	_1: A2(_elm_lang$core$Task$perform, _user$project$Main$UpdateWinSize, _elm_lang$window$Window$size)
@@ -11109,43 +11200,64 @@ var _user$project$Main$NameUpdate = function (a) {
 var _user$project$Main$DispUpdate = function (a) {
 	return {ctor: 'DispUpdate', _0: a};
 };
-var _user$project$Main$radioButton = function (color) {
-	return A2(
-		_elm_lang$html$Html$label,
-		{
-			ctor: '::',
-			_0: _user$project$Main$radioStyle,
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$html$Html$input,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$type_('radio'),
-					_1: {
+var _user$project$Main$radioButton = F2(
+	function (color, current) {
+		return A2(
+			_elm_lang$html$Html$label,
+			{
+				ctor: '::',
+				_0: _user$project$Main$radioStyle,
+				_1: {ctor: '[]'}
+			},
+			{
+				ctor: '::',
+				_0: A2(
+					_elm_lang$html$Html$input,
+					{
 						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$name('colorPick'),
+						_0: _elm_lang$html$Html_Attributes$checked(
+							_elm_lang$core$Native_Utils.eq(color, current)),
 						_1: {
 							ctor: '::',
-							_0: _elm_lang$html$Html_Events$onClick(
-								_user$project$Main$DispUpdate(
-									_user$project$Main$LS(color))),
-							_1: {ctor: '[]'}
+							_0: _elm_lang$html$Html_Attributes$type_('radio'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$name('colorPick'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(
+										_user$project$Main$DispUpdate(
+											_user$project$Main$LS(color))),
+									_1: {ctor: '[]'}
+								}
+							}
 						}
-					}
-				},
-				{ctor: '[]'}),
-			_1: {
-				ctor: '::',
-				_0: _elm_lang$html$Html$text(color),
-				_1: {ctor: '[]'}
-			}
-		});
-};
+					},
+					{ctor: '[]'}),
+				_1: {
+					ctor: '::',
+					_0: _elm_lang$html$Html$text(color),
+					_1: {ctor: '[]'}
+				}
+			});
+	});
 var _user$project$Main$preView = function (model) {
-	var n = '';
+	var img = function () {
+		var _p23 = model.display;
+		if (_p23.ctor === 'LS') {
+			return '';
+		} else {
+			return _p23._0.source;
+		}
+	}();
+	var current = function () {
+		var _p24 = model.display;
+		if (_p24.ctor === 'LS') {
+			return _p24._0;
+		} else {
+			return '';
+		}
+	}();
 	return A2(
 		_elm_lang$html$Html$div,
 		{
@@ -11195,7 +11307,7 @@ var _user$project$Main$preView = function (model) {
 							_elm_lang$html$Html$input,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$placeholder('unknown name'),
+								_0: _elm_lang$html$Html_Attributes$placeholder('name'),
 								_1: {
 									ctor: '::',
 									_0: _elm_lang$html$Html_Events$onInput(
@@ -11205,7 +11317,11 @@ var _user$project$Main$preView = function (model) {
 									_1: {
 										ctor: '::',
 										_0: _user$project$Main$radioStyle,
-										_1: {ctor: '[]'}
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$value(model.name),
+											_1: {ctor: '[]'}
+										}
 									}
 								}
 							},
@@ -11244,7 +11360,11 @@ var _user$project$Main$preView = function (model) {
 											_1: {
 												ctor: '::',
 												_0: _user$project$Main$radioStyle,
-												_1: {ctor: '[]'}
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$html$Html_Attributes$value(img),
+													_1: {ctor: '[]'}
+												}
 											}
 										}
 									},
@@ -11258,13 +11378,13 @@ var _user$project$Main$preView = function (model) {
 								{ctor: '[]'},
 								{
 									ctor: '::',
-									_0: _user$project$Main$radioButton('red'),
+									_0: A2(_user$project$Main$radioButton, 'red', current),
 									_1: {
 										ctor: '::',
-										_0: _user$project$Main$radioButton('blue'),
+										_0: A2(_user$project$Main$radioButton, 'blue', current),
 										_1: {
 											ctor: '::',
-											_0: _user$project$Main$radioButton('green'),
+											_0: A2(_user$project$Main$radioButton, 'green', current),
 											_1: {ctor: '[]'}
 										}
 									}
@@ -11342,7 +11462,44 @@ var _user$project$Main$preView = function (model) {
 												}
 											}
 										}),
-									_1: {ctor: '[]'}
+									_1: {
+										ctor: '::',
+										_0: A2(
+											_elm_lang$html$Html$div,
+											{ctor: '[]'},
+											{
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$label,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$input,
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$checked(model.fps),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$ToggleFPS),
+																		_1: {ctor: '[]'}
+																	}
+																}
+															},
+															{ctor: '[]'}),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('FPS'),
+															_1: {ctor: '[]'}
+														}
+													}),
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}
 								}
 							}
 						}
@@ -11352,8 +11509,8 @@ var _user$project$Main$preView = function (model) {
 		});
 };
 var _user$project$Main$view = function (model) {
-	var _p23 = model.inGame;
-	if (_p23 === true) {
+	var _p25 = model.inGame;
+	if (_p25 === true) {
 		return _user$project$Main$gameView(model);
 	} else {
 		return _user$project$Main$preView(model);
@@ -11375,13 +11532,13 @@ var _user$project$Main$update = F2(
 	function (msg, model) {
 		var rng = model.rng;
 		var rand = _user$project$Main$genRand(rng);
-		var _p24 = msg;
-		switch (_p24.ctor) {
+		var _p26 = msg;
+		switch (_p26.ctor) {
 			case 'KeyMsg':
-				var _p27 = _p24._0;
+				var _p29 = _p26._0;
 				if (_elm_lang$core$Native_Utils.eq(model.control, _user$project$Main$Keys)) {
-					var _p25 = _p27;
-					switch (_p25) {
+					var _p27 = _p29;
+					switch (_p27) {
 						case 87:
 							return {
 								ctor: '_Tuple2',
@@ -11480,8 +11637,8 @@ var _user$project$Main$update = F2(
 							return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 					}
 				} else {
-					var _p26 = _p27;
-					if (_p26 === 27) {
+					var _p28 = _p29;
+					if (_p28 === 27) {
 						return {
 							ctor: '_Tuple2',
 							_0: _user$project$Main$resetGame(model),
@@ -11492,35 +11649,43 @@ var _user$project$Main$update = F2(
 					}
 				}
 			case 'Tick':
+				var _p31 = _p26._0;
 				if (_elm_lang$core$Native_Utils.eq(model.control, _user$project$Main$Mouse)) {
-					var _p28 = A3(
+					var _p30 = A3(
 						_user$project$Main$mouseSpeed,
 						_user$project$Main$scCenter(model),
 						{ctor: '_Tuple2', _0: model.mx, _1: model.my},
 						2);
-					var dx = _p28._0;
-					var dy = _p28._1;
+					var dx = _p30._0;
+					var dy = _p30._1;
 					return {
 						ctor: '_Tuple2',
-						_0: _user$project$Main$testConsume(
-							_elm_lang$core$Native_Utils.update(
-								model,
-								{
-									x: A2(_user$project$Main$bCheckx, model.x + dx, model.size),
-									y: A2(_user$project$Main$bChecky, model.y + dy, model.size)
-								})),
+						_0: A2(
+							_user$project$Main$tick,
+							_p31,
+							_user$project$Main$testConsume(
+								_elm_lang$core$Native_Utils.update(
+									model,
+									{
+										x: A2(_user$project$Main$bCheckx, model.x + dx, model.size),
+										y: A2(_user$project$Main$bChecky, model.y + dy, model.size)
+									}))),
 						_1: rand
 					};
 				} else {
-					return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+					return {
+						ctor: '_Tuple2',
+						_0: A2(_user$project$Main$tick, _p31, model),
+						_1: _elm_lang$core$Platform_Cmd$none
+					};
 				}
 			case 'MouseMsg':
-				var _p29 = _p24._0;
+				var _p32 = _p26._0;
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{mx: _p29.x, my: _p29.y}),
+						{mx: _p32.x, my: _p32.y}),
 					{ctor: '[]'});
 			case 'DispUpdate':
 				return {
@@ -11528,7 +11693,7 @@ var _user$project$Main$update = F2(
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							display: _user$project$Main$updatePlayerDisplay(_p24._0)
+							display: _user$project$Main$updatePlayerDisplay(_p26._0)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -11537,7 +11702,7 @@ var _user$project$Main$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{name: _p24._0}),
+						{name: _p26._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'StartG':
@@ -11548,13 +11713,20 @@ var _user$project$Main$update = F2(
 						{inGame: true}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
+			case 'ToggleFPS':
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{fps: !model.fps}),
+					{ctor: '[]'});
 			case 'UpdateWinSize':
-				var _p30 = _p24._0;
+				var _p33 = _p26._0;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{winH: _p30.height, winW: _p30.width}),
+						{winH: _p33.height, winW: _p33.width}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
@@ -11562,7 +11734,7 @@ var _user$project$Main$update = F2(
 					_elm_lang$core$List$length(model.feed),
 					rng.limit) < 0) ? {
 					ctor: '_Tuple2',
-					_0: A4(_user$project$Main$genFeed, rng, _p24._0._0, _p24._0._1, model),
+					_0: A4(_user$project$Main$genFeed, rng, _p26._0._0, _p26._0._1, model),
 					_1: _elm_lang$core$Platform_Cmd$none
 				} : {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 		}
@@ -11571,17 +11743,18 @@ var _user$project$Main$KeyMsg = function (a) {
 	return {ctor: 'KeyMsg', _0: a};
 };
 var _user$project$Main$subscriptions = function (model) {
-	var ani = _elm_lang$core$Native_Utils.eq(model.control, _user$project$Main$Mouse) ? {
+	var ani = (_elm_lang$core$Native_Utils.eq(model.control, _user$project$Main$Mouse) || model.fps) ? {
 		ctor: '::',
 		_0: _elm_lang$animation_frame$AnimationFrame$times(_user$project$Main$Tick),
-		_1: {
-			ctor: '::',
-			_0: _elm_lang$mouse$Mouse$moves(_user$project$Main$MouseMsg),
-			_1: {ctor: '[]'}
-		}
+		_1: {ctor: '[]'}
 	} : {ctor: '[]'};
-	var _p31 = model.inGame;
-	if (_p31 === true) {
+	var mice = _elm_lang$core$Native_Utils.eq(model.control, _user$project$Main$Mouse) ? {
+		ctor: '::',
+		_0: _elm_lang$mouse$Mouse$moves(_user$project$Main$MouseMsg),
+		_1: {ctor: '[]'}
+	} : {ctor: '[]'};
+	var _p34 = model.inGame;
+	if (_p34 === true) {
 		return _elm_lang$core$Platform_Sub$batch(
 			A2(
 				_elm_lang$core$Basics_ops['++'],
@@ -11594,7 +11767,7 @@ var _user$project$Main$subscriptions = function (model) {
 						_1: {ctor: '[]'}
 					}
 				},
-				ani));
+				A2(_elm_lang$core$Basics_ops['++'], ani, mice)));
 	} else {
 		return _elm_lang$core$Platform_Sub$none;
 	}
