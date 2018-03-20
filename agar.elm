@@ -6,43 +6,62 @@ import Html.Attributes exposing (..)
 import Platform.Cmd as Cmd
 import Platform.Sub as Sub
 import Keyboard as Key
+import Mouse as Mouse
 import Svg exposing (..)
 import Svg.Attributes exposing (..)
 import Random exposing (..)
 import Window exposing (..)
 import Task exposing (..)
+import AnimationFrame as Anim
 
 --a highly simplified version of agar.io, not going to bother with the time needed to make the background scroll and other stuff
 
 --to make the type definitions a lot more easier
 type alias FeedBit = List Feed
-type alias Feed = {x:Int,y:Int,value:Int,color:String}
+type alias Feed = {x:Int,y:Int,value:Float,color:String}
 
 type Either a b = RS a | LS b -- lazy implementation of Haskell's Either
 
 type alias Display = Either PImage String -- can be one or the other, need to extract on display
 type alias PImage = {source:String} -- basic stuff needed to model the player image
 
-type alias Model = {x:Int, y:Int,
+type Control = Mouse | Keys
+
+type alias RNG = {range:Int,regChance:Int,superChance:Int,limit:Int}-- various stuffs that control the RNG aspects of the game
+
+type alias Model = {x:Float, y:Float,
+                    mx:Int,my:Int,
                     winH: Int, winW:Int,
                     name:String,
                     feed: FeedBit,
                     size:Float,
                     display:Display,
+                    control:Control,
+                    rng:RNG,
                     inGame:Bool} -- list of records representing the different dots etc
 type alias DUpdate = Either String String --either holds info on whether it came for URL input or radio button input
 
-type Msg = KeyMsg Key.KeyCode | RandResult (Int,Int) | DispUpdate DUpdate |NameUpdate String | StartG | UpdateWinSize Window.Size
+type Msg = KeyMsg Key.KeyCode 
+            | RandResult (Int,Int)
+            | DispUpdate DUpdate 
+            | NameUpdate String 
+            | StartG 
+            | UpdateWinSize Window.Size
+            | Tick Float
+            | MouseMsg Mouse.Position
 
 
 init : (Model, Cmd.Cmd Msg)
-init = ({x=round<| (toFloat svWidth)/2,
-        y=round <| (toFloat svHeight)/2,
+init = ({x=(toFloat svWidth)/2,
+        y=(toFloat svHeight)/2,
+        mx = 0,my=0,
         winH = 0, winW = 0,
-        name="unknown",
+        name="",--default name in agar.io, aka nothing
         feed=[],
         size=25,-- set size to a really big number to see - infinity
+        control=Mouse,
         display = LS "red",
+        rng = {range = 50, regChance=1, superChance=0,limit=100},
         inGame=False
     }
     , Task.perform UpdateWinSize Window.size)
@@ -60,19 +79,54 @@ resetGame model = let
 
 
 
-incNum : Int
+incNum : Float
 incNum = 10
+
+pow : Float -> Int -> Float
+pow x num = case num of
+                0 -> 1
+                _ -> x*(pow x (num-1))
+
+-- tuple of the center of the screen,mousePos,maxSpeed returns dx,dy
+mouseSpeed : (Float,Float) ->(Int,Int)->Float -> (Float,Float)
+mouseSpeed (x,y) (ma,mb) speed = let
+        mx = Basics.toFloat ma
+        my = Basics.toFloat mb
+        rx = 0.01*(mx-x)
+        ry = 0.01*(my-y)
+        r = Basics.sqrt ((pow rx 2)+(pow ry 2))
+        ds = if r > speed || Basics.isNaN r then speed else r
+        theta = (Basics.atan2 ry rx)
+        dx = ds*(Basics.cos theta)
+        dy = ds*(Basics.sin theta)
+    in (dx,dy)
+--gets center of screen
+scCenter : Model -> (Float,Float)
+scCenter model = let
+        x = toFloat model.winW
+        y = toFloat model.winH
+    in ((x/2),(y/2))
+
 --takes boundary, position
-boundsCheck : Int -> Int ->Int -> Int
-boundsCheck bounds pos rad = if pos>=bounds+rad then
+boundsCheck : Int -> Float ->Float -> Float
+boundsCheck b pos rad = let 
+                            bounds = Basics.toFloat b
+                        in if pos>=bounds+rad then
                             pos-bounds-(2*rad)
                         else if pos <= -rad then
                             pos + bounds+(2*rad)
                         else
                             pos
 
-genViewBox : Int -> (Int,Int)->Svg.Attribute msg
-genViewBox rad (x,y)= Svg.Attributes.viewBox ((x-rad*4|>toString)++" "++(y-rad*4|>toString)++" "++(rad*8|>toString)++" "++(rad*8|>toString))
+genViewBox : Float -> (Float,Float)->Svg.Attribute msg
+genViewBox rad (x,y)= let
+        (vx,vy,vw,vh) = genVBox rad (x,y)
+    in Svg.Attributes.viewBox (vx++" "++vy++" "++vw++" "++vh)
+
+genVBox : Float -> (Float,Float) -> (String,String,String,String)
+genVBox rad (x,y) =let
+        factor = (2*rad)+26
+    in ((x-factor|>toString),(y-factor|>toString),(factor*2|>toString),(factor*2|>toString))
 
 svWidth : Int 
 svWidth = 1300
@@ -81,18 +135,14 @@ svHeight : Int
 svHeight = 600
 
 --compute the radius based on the size
-mr :Int -> Int 
-mr i = round <| Basics.sqrt <| ((toFloat i)/Basics.pi)*2
-
---legacy stuff
-radius : Int
-radius = 10
+mr :Float -> Float 
+mr i = Basics.sqrt <| (i/Basics.pi)*2
 
 --wrapping
-bCheckx : Int -> Int ->Int
+bCheckx : Float -> Float ->Float
 bCheckx pos size = boundsCheck svWidth pos (mr size)
 
-bChecky : Int ->Int -> Int
+bChecky : Float -> Float -> Float
 bChecky pos size = boundsCheck svHeight pos (mr size)
 
 --render feed bits
@@ -131,14 +181,14 @@ drawYLines inc len ly total lines= if ly>total then lines
 testConsume: Model -> Model
 testConsume model = let
         feeds = model.feed
-        consumed = List.map (canConsume (mr <| round <| model.size) model.x model.y) feeds -- messy mapping stuff to produce a boolean list
+        consumed = List.map (canConsume (mr model.size) model.x model.y) feeds -- messy mapping stuff to produce a boolean list
         both = wrap consumed feeds --wrap the two together lazily in a tuple
     in {model | feed = filterOut both [], size = shrink <|consume both model.size}--update model
 
 shrink:Float -> Float
 --shrink size = size - (sqrt ((size-25) /10000000) ) -- basically shrink faster if larger, though at a slower rate, pretty much grow forever like this
-shrink size = size - (((size*size)-625) / 10000000) --shrink really fast when big, constant gen max ~ 2236 (can get higher if you game it), rng god gen max about 70711
-
+--shrink size = size - (((size*size)-625) / 10000000) --shrink really fast when big, constant gen max ~ 2236 (can get higher if you game it), rng god gen max about 70711
+shrink size = size - (((size*size)-625) / 50000000) --shrink really fast when big, constant gen max ~ 2236 (can get higher if you game it), rng god gen max about 70711
 --lazy wrapping cause seriously no way to do this kind of thing without going into a bunch of messy case x of and Maybes
 --Also the two lists should be the same size in the usage scenario
 wrap : List a -> List b -> List (a,b)
@@ -156,22 +206,23 @@ filterOut both feeds = case both of
 --list of whether can consumeor not > feed list to extract size > current size
 consume: List (Bool,Feed) -> Float -> Float 
 consume feeds size = case feeds of
-        ((True,f)::fs)  -> consume fs (size+(toFloat <| f.value))
+        ((True,f)::fs)  -> consume fs (size+f.value)
         ((False,_)::fs) -> consume fs size
         []              -> size
 
 -- ints are radius and position
-canConsume: Int -> Int -> Int -> Feed -> Bool
+canConsume: Float -> Float -> Float -> Feed -> Bool
 canConsume r x y f= let
-            distance = Basics.sqrt (toFloat (((f.x-x)*(f.x-x))+((f.y-y)*(f.y-y))))
-        in (distance<(toFloat <| r+ (mr f.value)))
+            distance = Basics.sqrt ((((toFloat f.x)-x)*((toFloat f.x)-x))+(((toFloat f.y)-y)*((toFloat f.y)-y)))
+        in (distance<r + (mr f.value))
 
 
-genFeed: Int -> Int -> Model -> Model
-genFeed a b model = case a of 
-            1 -> {model | feed = addFeed model.feed 5 (b%svWidth) (round <| toFloat b/(toFloat svWidth))} 
-            _ -> model -- only gen on rand = 1
-addFeed: FeedBit -> Int -> Int -> Int -> FeedBit
+genFeed: RNG -> Int -> Int -> Model -> Model
+genFeed rng a b model = if a<=rng.regChance
+            then {model | feed = addFeed model.feed 5 (b%svWidth) (round <| toFloat b/(toFloat svWidth))} 
+            else if a<=rng.regChance+rng.superChance then {model | feed = addFeed model.feed 10 (b%svWidth) (round<| toFloat b/(toFloat svWidth))}
+            else model -- only gen on rand = 1
+addFeed: FeedBit -> Float -> Int -> Int -> FeedBit
 addFeed f v x y = {x=x, y=y,value=v,color=genColor (x+y)}::f
 
 --semi random based on position
@@ -196,35 +247,50 @@ genColor x = let
                 _ -> "white" -- the devil's dot, aka it can't be seen
 
 
-updatePlayerDisplay: DUpdate -> Display -> Display
-updatePlayerDisplay du model = case du of 
+updatePlayerDisplay: DUpdate -> Display
+updatePlayerDisplay du = case du of 
                     (LS s) -> LS s
                     (RS s) -> RS {source=s}
 
 update : Msg -> Model -> (Model, Cmd.Cmd Msg)
-update msg model = case msg of --wasd
-            (KeyMsg 87) -> (testConsume {model|y = bChecky (model.y-incNum) (round <| model.size)},genRand)
-            (KeyMsg 65) -> (testConsume {model|x = bCheckx (model.x-incNum) (round <| model.size)},genRand)
-            (KeyMsg 83) -> (testConsume {model|y = bChecky (model.y+incNum) (round <| model.size)},genRand)
-            (KeyMsg 68) -> (testConsume {model|x = bCheckx (model.x+incNum) (round <| model.size)},genRand)
-            --arrow keys
-            (KeyMsg 38) -> (testConsume {model|y = bChecky (model.y-incNum) (round <| model.size)},genRand)
-            (KeyMsg 37) -> (testConsume {model|x = bCheckx (model.x-incNum) (round <| model.size)},genRand)
-            (KeyMsg 40) -> (testConsume {model|y = bChecky (model.y+incNum) (round <| model.size)},genRand)
-            (KeyMsg 39) -> (testConsume {model|x = bCheckx (model.x+incNum) (round <| model.size)},genRand)
-            --reset the game if escape key is pressed
-            (KeyMsg 27) -> (resetGame model, Cmd.none)
-            (DispUpdate u) -> ({model | display = updatePlayerDisplay u model.display},Cmd.none)
+update msg model = let
+            rng = model.rng
+            rand = genRand rng
+        in case msg of --wasd
+            (KeyMsg k) -> if model.control==Keys then case k of 
+                                87 -> (testConsume {model|y = bChecky (model.y-incNum) model.size},rand)
+                                65 -> (testConsume {model|x = bCheckx (model.x-incNum) model.size},rand)
+                                83 -> (testConsume {model|y = bChecky (model.y+incNum) model.size},rand)
+                                68 -> (testConsume {model|x = bCheckx (model.x+incNum) model.size},rand)
+                                --arrow keys
+                                38 -> (testConsume {model|y = bChecky (model.y-incNum) model.size},rand)
+                                37 -> (testConsume {model|x = bCheckx (model.x-incNum) model.size},rand)
+                                40 -> (testConsume {model|y = bChecky (model.y+incNum) model.size},rand)
+                                39 -> (testConsume {model|x = bCheckx (model.x+incNum) model.size},rand)
+                                --reset the game if escape key is pressed
+                                27 -> (resetGame model, Cmd.none)
+                                _  -> (model,Cmd.none)
+                            else case k of
+                                27 -> (resetGame model,Cmd.none)
+                                _  -> (model,Cmd.none)
+            (Tick t) -> if model.control==Mouse then let
+                                                    (dx,dy) = mouseSpeed (scCenter model) (model.mx,model.my) 2
+                                                in (testConsume {model| 
+                                                    x = (bCheckx (model.x+dx) model.size), 
+                                                    y = (bChecky (model.y+dy) model.size)},rand)
+                                            else (model,Cmd.none)
+            (MouseMsg pos) -> {model| mx = pos.x,my=pos.y}![]
+            (DispUpdate u) -> ({model | display = updatePlayerDisplay u},Cmd.none)
             (NameUpdate s) -> ({model | name = s},Cmd.none)
             (StartG)       -> ({model | inGame = True},Cmd.none)
             (UpdateWinSize s) -> ({model | winH = s.height, winW = s.width},Cmd.none)
-            (RandResult (a,b)) -> if (List.length model.feed < 100)  --limit so there's an upper bound to the size
-                                then (genFeed a b model,Cmd.none) 
+            (RandResult (a,b)) -> if (List.length model.feed < rng.limit)  --limit so there's an upper bound to the size, over 1000 it starts getting slow
+                                then (genFeed rng a b model,Cmd.none) 
                                 else (model,Cmd.none)
-            _ -> (model,Cmd.none)
+            --_ -> (model,Cmd.none)
 
-
-genRand = generate RandResult (Random.pair (int 1 10 ) (int 1 (svWidth*svHeight)))
+--genRand : RNG -> Cmd.Cmd Msg﻿
+genRand rng = generate RandResult (Random.pair (int 1 rng.range) (int 1 (svWidth*svHeight)))
 
 gameView : Model -> Html Msg -- view used for when the game is being played
 gameView model = 
@@ -238,8 +304,9 @@ gameView model =
         pImage = case model.display of
             (LS _) -> image [][]
             (RS r) -> image [x "0%",y "0%",Svg.Attributes.height "5000",Svg.Attributes.width "5000",Svg.Attributes.xlinkHref r.source][]
-        vBox = genViewBox (mr <| round <| model.size) (model.x,model.y)
+        vBox = genViewBox (mr model.size) (model.x,model.y)
         gridlines = drawLines
+        (vx1,vy1,vw,vh) = genVBox (mr model.size) (model.x,model.y)
     in div[Html.Attributes.style[("margin","0"),("padding","0"),("overflow","hidden")]][-- fixed positioning of SVG https://stackoverflow.com/questions/5643254/how-to-scale-svg-image-to-fill-browser-window
         svg[Html.Attributes.style[("position","fixed"),("top","0"),("left","0"),("height","100%"),("width","100%")],vBox](
             [--image in svg based on this https://stackoverflow.com/questions/29442833/svg-image-inside-circle
@@ -248,7 +315,25 @@ gameView model =
                     pImage-- um... somehow if you set viewbox = image height/width it automatically sizes it for you... *throws away a bunch of code that hasn't been coded yet*
                     ]
                 ]
-            ]++gridlines++feeds++[Svg.circle [cx posX,cy posY, r (toString <| mr <| round model.size),fill pfill, stroke "black", Svg.Attributes.strokeWidth "1px"] []])
+            ]
+            ++gridlines
+            ++feeds
+            ++[Svg.circle [cx posX,cy posY, r (toString <| mr model.size),fill pfill, stroke "black", Svg.Attributes.strokeWidth "1px"] []]
+            ++[Svg.text_ [x posX, y posY, Svg.Attributes.textAnchor "middle",Svg.Attributes.alignmentBaseline "middle", Html.Attributes.style [
+                    ("font-size",(toString <|( mr model.size)/2)++"px")
+                    ,("font-weight","bold")
+                    ,("fill","white")
+                    ,("fill-opacity","1")
+                    ,("stroke","#000")
+                    ,("stroke-width",(toString <| (mr model.size)/50)++"px")
+                    ,("stroke-linecap","butt")
+                    ,("stroke-linejoin","miter")
+                    ,("stroke-opacity","1")
+                    ,("font-family","Sans-Serif")]
+                ][Svg.text model.name]]-- outlined text https://stackoverflow.com/questions/442164/how-to-get-an-outline-effect-on-text-in-svg
+            --viewbox testing
+            --++[Svg.rect [fill "none",Svg.Attributes.x vx1,Svg.Attributes.y vy1,Svg.Attributes.height vh,Svg.Attributes.width vh, Svg.Attributes.strokeWidth ".5px",Svg.Attributes.stroke "red"][]]
+            )
         ,div[Html.Attributes.style[("position","fixed"),("bottom","1%"),("left","1%"),("color","white"),("background-color","darkgrey"),("opacity","0.7")]][
             strong[][Html.text ("Score: "++(toString <|round<| model.size-25))]
             ]
@@ -275,10 +360,10 @@ preView model =
             radioButton "blue",
             radioButton "green"
             ]
-        ,div[][button[Html.Events.onClick StartG][Html.text "Start"]]
+        ,div[][button[Html.Attributes.style [("background-color","green"),("color","white")],Html.Events.onClick StartG][Html.text "Start"]]
         ,div[][
             strong[][Html.text "Instructions:"]
-            ,p[][Html.text "Use the arrow keys or WASD to move the circle around"]
+            ,p[][Html.text "Use the mouse move the circle around, press ESC to quit the game at any time"]
             ,p[][Html.text "The goal is eat smaller dots and grow. Try to get to 2000 points, and as a really really difficult challenge 2300"]
             ]
     ]
@@ -289,8 +374,10 @@ view model = case model.inGame of
     False -> preView model
 
 subscriptions : Model -> Sub.Sub Msg
-subscriptions model = case model.inGame of
-    True -> Sub.batch[Key.downs KeyMsg,Window.resizes UpdateWinSize] -- only need keys during game
+subscriptions model = let
+        ani = if model.control==Mouse then [Anim.times Tick,Mouse.moves MouseMsg] else []
+    in case model.inGame of
+    True -> Sub.batch([Key.downs KeyMsg,Window.resizes UpdateWinSize]++ani) -- only need keys during game
     False -> Sub.none --- listens to nothing due to nothing going on pre game
 
 main : Program Never Model Msg
