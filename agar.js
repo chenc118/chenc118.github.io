@@ -11178,7 +11178,7 @@ var _user$project$Main$init = {
 		feed: {ctor: '[]'},
 		size: 25,
 		control: _user$project$Main$Mouse,
-		display: _user$project$Main$LS('red'),
+		display: _user$project$Main$LS('#FF0000'),
 		rng: {range: 50, regChance: 1, superChance: 0, limit: 100},
 		fps: true,
 		tickFrames: {first: 0, count: 0},
@@ -11200,8 +11200,8 @@ var _user$project$Main$NameUpdate = function (a) {
 var _user$project$Main$DispUpdate = function (a) {
 	return {ctor: 'DispUpdate', _0: a};
 };
-var _user$project$Main$radioButton = F2(
-	function (color, current) {
+var _user$project$Main$radioButton = F3(
+	function (color, current, display) {
 		return A2(
 			_elm_lang$html$Html$label,
 			{
@@ -11236,7 +11236,7 @@ var _user$project$Main$radioButton = F2(
 					{ctor: '[]'}),
 				_1: {
 					ctor: '::',
-					_0: _elm_lang$html$Html$text(color),
+					_0: _elm_lang$html$Html$text(display),
 					_1: {ctor: '[]'}
 				}
 			});
@@ -11378,13 +11378,13 @@ var _user$project$Main$preView = function (model) {
 								{ctor: '[]'},
 								{
 									ctor: '::',
-									_0: A2(_user$project$Main$radioButton, 'red', current),
+									_0: A3(_user$project$Main$radioButton, '#FF0000', current, 'red'),
 									_1: {
 										ctor: '::',
-										_0: A2(_user$project$Main$radioButton, 'blue', current),
+										_0: A3(_user$project$Main$radioButton, '#0000FF', current, 'blue'),
 										_1: {
 											ctor: '::',
-											_0: A2(_user$project$Main$radioButton, 'green', current),
+											_0: A3(_user$project$Main$radioButton, '#008000', current, 'green'),
 											_1: {ctor: '[]'}
 										}
 									}
@@ -11397,29 +11397,35 @@ var _user$project$Main$preView = function (model) {
 									{
 										ctor: '::',
 										_0: A2(
-											_elm_lang$html$Html$button,
+											_elm_lang$html$Html$label,
+											{ctor: '[]'},
 											{
 												ctor: '::',
-												_0: _elm_lang$html$Html_Attributes$style(
-													{
-														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'green'},
-														_1: {
-															ctor: '::',
-															_0: {ctor: '_Tuple2', _0: 'color', _1: 'white'},
-															_1: {ctor: '[]'}
-														}
-													}),
+												_0: _elm_lang$html$Html$text('Color Picker:'),
 												_1: {
 													ctor: '::',
-													_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$StartG),
+													_0: A2(
+														_elm_lang$html$Html$input,
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html_Attributes$type_('color'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html_Attributes$value(current),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Events$onInput(
+																		function (inp) {
+																			return _user$project$Main$DispUpdate(
+																				_user$project$Main$LS(inp));
+																		}),
+																	_1: {ctor: '[]'}
+																}
+															}
+														},
+														{ctor: '[]'}),
 													_1: {ctor: '[]'}
 												}
-											},
-											{
-												ctor: '::',
-												_0: _elm_lang$html$Html$text('Start'),
-												_1: {ctor: '[]'}
 											}),
 										_1: {ctor: '[]'}
 									}),
@@ -11431,36 +11437,31 @@ var _user$project$Main$preView = function (model) {
 										{
 											ctor: '::',
 											_0: A2(
-												_elm_lang$html$Html$strong,
-												{ctor: '[]'},
+												_elm_lang$html$Html$button,
 												{
 													ctor: '::',
-													_0: _elm_lang$html$Html$text('Instructions:'),
-													_1: {ctor: '[]'}
-												}),
-											_1: {
-												ctor: '::',
-												_0: A2(
-													_elm_lang$html$Html$p,
-													{ctor: '[]'},
-													{
-														ctor: '::',
-														_0: _elm_lang$html$Html$text('Use the mouse move the circle around, press ESC to quit the game at any time'),
-														_1: {ctor: '[]'}
-													}),
-												_1: {
-													ctor: '::',
-													_0: A2(
-														_elm_lang$html$Html$p,
-														{ctor: '[]'},
+													_0: _elm_lang$html$Html_Attributes$style(
 														{
 															ctor: '::',
-															_0: _elm_lang$html$Html$text('The goal is eat smaller dots and grow. Try to get to 2000 points, and as a really really difficult challenge 2300'),
-															_1: {ctor: '[]'}
+															_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'green'},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: 'color', _1: 'white'},
+																_1: {ctor: '[]'}
+															}
 														}),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$StartG),
+														_1: {ctor: '[]'}
+													}
+												},
+												{
+													ctor: '::',
+													_0: _elm_lang$html$Html$text('Start'),
 													_1: {ctor: '[]'}
-												}
-											}
+												}),
+											_1: {ctor: '[]'}
 										}),
 									_1: {
 										ctor: '::',
@@ -11470,35 +11471,75 @@ var _user$project$Main$preView = function (model) {
 											{
 												ctor: '::',
 												_0: A2(
-													_elm_lang$html$Html$label,
+													_elm_lang$html$Html$strong,
 													{ctor: '[]'},
 													{
 														ctor: '::',
+														_0: _elm_lang$html$Html$text('Instructions:'),
+														_1: {ctor: '[]'}
+													}),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$p,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: _elm_lang$html$Html$text('Use the mouse move the circle around, press ESC to quit the game at any time'),
+															_1: {ctor: '[]'}
+														}),
+													_1: {
+														ctor: '::',
 														_0: A2(
-															_elm_lang$html$Html$input,
+															_elm_lang$html$Html$p,
+															{ctor: '[]'},
 															{
 																ctor: '::',
-																_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
-																_1: {
+																_0: _elm_lang$html$Html$text('The goal is eat smaller dots and grow. Try to get to 2000 points, and as a difficult challenge 2200'),
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													}
+												}
+											}),
+										_1: {
+											ctor: '::',
+											_0: A2(
+												_elm_lang$html$Html$div,
+												{ctor: '[]'},
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$label,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$input,
+																{
 																	ctor: '::',
-																	_0: _elm_lang$html$Html_Attributes$checked(model.fps),
+																	_0: _elm_lang$html$Html_Attributes$type_('checkbox'),
 																	_1: {
 																		ctor: '::',
-																		_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$ToggleFPS),
-																		_1: {ctor: '[]'}
+																		_0: _elm_lang$html$Html_Attributes$checked(model.fps),
+																		_1: {
+																			ctor: '::',
+																			_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$ToggleFPS),
+																			_1: {ctor: '[]'}
+																		}
 																	}
-																}
-															},
-															{ctor: '[]'}),
-														_1: {
-															ctor: '::',
-															_0: _elm_lang$html$Html$text('FPS'),
-															_1: {ctor: '[]'}
-														}
-													}),
-												_1: {ctor: '[]'}
-											}),
-										_1: {ctor: '[]'}
+																},
+																{ctor: '[]'}),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('FPS'),
+																_1: {ctor: '[]'}
+															}
+														}),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}
 									}
 								}
 							}

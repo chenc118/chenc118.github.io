@@ -64,7 +64,7 @@ init = ({x=(toFloat svWidth)/2,
         feed=[],
         size=25,-- set size to a really big number to see - infinity
         control=Mouse,
-        display = LS "red",
+        display = LS "#FF0000",
         rng = {range = 50, regChance=1, superChance=0,limit=100},
         fps = True,
         tickFrames={first=0,count=0},-- debug for animation tickRate
@@ -378,13 +378,13 @@ gameView model =
 
 radioStyle = Html.Attributes.style[("clear","both"),("margin","auto"),("text-align","unset")]
 
-radioButton : String -> String -> Html Msg
-radioButton color current= label[radioStyle][
+radioButton : String -> String -> String ->  Html Msg
+radioButton color current display= label[radioStyle][
             input[Html.Attributes.checked (color==current)
                 ,Html.Attributes.type_ "radio"
                 ,Html.Attributes.name "colorPick"
                 ,onClick (DispUpdate (LS color))][]
-            ,Html.text color
+            ,Html.text display
         ]
 
 preView : Model -> Html Msg
@@ -402,15 +402,24 @@ preView model =
         ,div [][Html.text "Enter the url for the image or choose a color from below"]
         ,div[][input [Html.Attributes.placeholder "Input Image URL", onInput (\inp ->DispUpdate (RS inp)),radioStyle, Html.Attributes.value img][]]
         ,div[][--div holding a bunch of stuff relating to the color
-            radioButton "red" current,
-            radioButton "blue" current,
-            radioButton "green" current
+            radioButton "#FF0000" current "red",
+            radioButton "#0000FF" current "blue",
+            radioButton "#008000" current "green"
             ]
-        ,div[][button[Html.Attributes.style [("background-color","green"),("color","white")],Html.Events.onClick StartG][Html.text "Start"]]
+        ,div [][
+            label [][
+                Html.text "Color Picker:"
+                ,input [Html.Attributes.type_ "color", Html.Attributes.value current, Html.Events.onInput (\inp -> DispUpdate (LS inp))][]
+                
+                ]
+            ]
+        ,div[][
+            button[Html.Attributes.style [("background-color","green"),("color","white")],Html.Events.onClick StartG][Html.text "Start"]
+            ]
         ,div[][
             strong[][Html.text "Instructions:"]
             ,p[][Html.text "Use the mouse move the circle around, press ESC to quit the game at any time"]
-            ,p[][Html.text "The goal is eat smaller dots and grow. Try to get to 2000 points, and as a really really difficult challenge 2300"]
+            ,p[][Html.text "The goal is eat smaller dots and grow. Try to get to 2000 points, and as a difficult challenge 2200"]
             ]
         ,div[][
             label [][input [Html.Attributes.type_ "checkbox", Html.Attributes.checked model.fps, onClick ToggleFPS][], Html.text "FPS"]
