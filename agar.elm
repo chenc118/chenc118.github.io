@@ -39,6 +39,7 @@ type alias Model = {x:Float, y:Float,
                     control:Control,
                     rng:RNG,
                     fps:Bool,
+                    minimap:Bool,
                     tickFrames:{first:Float,count:Int},--stuff to get the FPS aka ticks/second
                     tickRate:Float,
                     inGame:Bool} -- list of records representing the different dots etc
@@ -52,7 +53,7 @@ type Msg = KeyMsg Key.KeyCode
             | UpdateWinSize Window.Size
             | Tick Float
             | MouseMsg Mouse.Position
-            | ToggleFPS
+            | Toggle String
 
 
 init : (Model, Cmd.Cmd Msg)
@@ -64,9 +65,10 @@ init = ({x=(toFloat svWidth)/2,
         feed=[],
         size=25,-- set size to a really big number to see - infinity
         control=Mouse,
-        display = LS "#FF0000",
+        display = LS "#ff0000",
         rng = {range = 50, regChance=1, superChance=0,limit=100},
         fps = True,
+        minimap = True,
         tickFrames={first=0,count=0},-- debug for animation tickRate
         tickRate=0,
         inGame=False
@@ -166,9 +168,9 @@ bChecky : Float -> Float -> Float
 bChecky pos size = boundsCheck svHeight pos (mr size)
 
 --render feed bits
-buildFeeds: FeedBit -> List (Svg.Svg msg)
-buildFeeds feed = case feed of -- literally just a bunch of tiny circles
-                    (f::fs) -> (Svg.circle [cx (toString f.x),cy (toString f.y), r (toString <| mr f.value), fill f.color][])::(buildFeeds fs)
+buildFeeds: FeedBit -> Float -> List (Svg.Svg msg)
+buildFeeds feed mult = case feed of -- literally just a bunch of tiny circles
+                    (f::fs) -> (Svg.circle [cx (toString f.x),cy (toString f.y), r (toString <| mult*(mr f.value)), fill f.color][])::(buildFeeds fs mult)
                     []      -> []-- return empty list on list end
 
 
@@ -314,7 +316,10 @@ update msg model = let
             (DispUpdate u) -> ({model | display = updatePlayerDisplay u},Cmd.none)
             (NameUpdate s) -> ({model | name = s},Cmd.none)
             (StartG)       -> ({model | inGame = True},Cmd.none)
-            (ToggleFPS)    -> {model | fps = Basics.not model.fps} ![]
+            (Toggle s)     ->  case s of 
+                                    "FPS"     -> {model | fps = Basics.not model.fps} ![]
+                                    "minimap" -> {model | minimap = Basics.not model.minimap} ![]
+                                    _         -> model ![]
             (UpdateWinSize s) -> ({model | winH = s.height, winW = s.width},Cmd.none)
             (RandResult (a,b)) -> if (List.length model.feed < rng.limit)  --limit so there's an upper bound to the size, over 1000 it starts getting slow
                                 then (genFeed rng a b model,Cmd.none) 
@@ -349,7 +354,7 @@ gameView model =
                 ]
             ]
             ++gridlines
-            ++feeds
+            ++(feeds 1)
             ++[Svg.circle [cx posX,cy posY, r (toString <| mr model.size),fill pfill, stroke "black", Svg.Attributes.strokeWidth "1px"] []]
             ++[Svg.text_ [x posX, y posY, Svg.Attributes.textAnchor "middle",Svg.Attributes.alignmentBaseline "middle", Html.Attributes.style [
                     ("font-size",(toString <|( mr model.size)/2)++"px")-- dynamic scaling of text wrt size
@@ -371,6 +376,14 @@ gameView model =
             ]
         ,div[Html.Attributes.hidden (not model.fps), Html.Attributes.style[("position","fixed"),("top","1%"),("left","1%"),("color","white"),("background-color","darkgrey"),("opacity","0.7")]][
             strong[][Html.text ("FPS: "++(toString <|round<| model.tickRate))]
+            ]
+        ,div[Html.Attributes.hidden (not model.minimap), Html.Attributes.style [("position","fixed"),("bottom","1%"),("right","1%"),("height","10%"),("width","10%")]][
+            Svg.svg[Svg.Attributes.viewBox ("0 0 "++(toString svWidth)++" "++(toString svHeight))]([
+                Svg.rect[Svg.Attributes.x "0",Svg.Attributes.y "0", Svg.Attributes.height <| toString svHeight,Svg.Attributes.width <| toString svWidth,Svg.Attributes.fill "white",Svg.Attributes.strokeWidth "1%", Svg.Attributes.stroke "black"][]
+                ,Svg.rect [Svg.Attributes.x vx1, Svg.Attributes.y vy1, Svg.Attributes.width vw, Svg.Attributes.height vh,Svg.Attributes.fill pfill][]
+                ]
+                ++(feeds 5)
+                )
             ]
         ]
 
@@ -402,8 +415,8 @@ preView model =
         ,div [][Html.text "Enter the url for the image or choose a color from below"]
         ,div[][input [Html.Attributes.placeholder "Input Image URL", onInput (\inp ->DispUpdate (RS inp)),radioStyle, Html.Attributes.value img][]]
         ,div[][--div holding a bunch of stuff relating to the color
-            radioButton "#FF0000" current "red",
-            radioButton "#0000FF" current "blue",
+            radioButton "#ff0000" current "red",
+            radioButton "#0000ff" current "blue",
             radioButton "#008000" current "green"
             ]
         ,div [][
@@ -422,7 +435,8 @@ preView model =
             ,p[][Html.text "The goal is eat smaller dots and grow. Try to get to 2000 points, and as a difficult challenge 2200"]
             ]
         ,div[][
-            label [][input [Html.Attributes.type_ "checkbox", Html.Attributes.checked model.fps, onClick ToggleFPS][], Html.text "FPS"]
+            label [][input [Html.Attributes.type_ "checkbox", Html.Attributes.checked model.fps, onClick (Toggle "FPS")][], Html.text "FPS"]
+            ,label [][input [Html.Attributes.type_ "checkbox", Html.Attributes.checked model.minimap, onClick (Toggle "minimap")][], Html.text "minimap"]
             ]
     ]
 
