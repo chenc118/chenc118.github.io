@@ -1,14 +1,606 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  </head>
-  <body>
-    <div id="elm-code-is-loaded-here"></div>
-    <!-- External styelsheet loading copied from http://elmprogramming.com/building-a-simple-page-in-elm.html -->
-    <script src="agar.js"></script>
-    <script>
-      Elm.Main.embed(document.getElementById("elm-code-is-loaded-here"));
-    </script>
-  </body>
+<!--[if lt IE 8 ]><html class="no-js ie ie7" lang="en"> <![endif]-->
+<!--[if IE 8 ]><html class="no-js ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 8)|!(IE)]><!--><html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+
+   <!--- Basic Page Needs
+   ================================================== -->
+   <meta charset="utf-8">
+	<title>CV Page - C. Chen</title>
+	<meta name="description" content="A temporary CV page taken from a template as I do not have the time to code on myself">
+	<meta name="author" content="">
+
+   <!-- Mobile Specific Metas
+   ================================================== -->
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<!-- CSS
+    ================================================== -->
+   <link rel="stylesheet" href="css/default.css">
+	<link rel="stylesheet" href="css/layout.css">
+   <link rel="stylesheet" href="css/media-queries.css">
+   <link rel="stylesheet" href="css/magnific-popup.css">
+   <link rel="stylesheet" href="css/custom.css"> <!-- Custom CSS stuffs -->
+
+   <!-- Script
+   ================================================== -->
+	<script src="js/modernizr.js"></script>
+
+   <!-- Favicons
+	================================================== -->
+	<link rel="shortcut icon" href="favicon.png" >
+   <!-- Font-Awesome v5
+   ================================================== -->
+   <!-- Local Font-Awesome CSS -->
+   <link rel="stylesheet" href="css/font-awesomev5/css/fontawesome-all.css">
+   <!-- From site font-awesome CSS -->
+   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css" integrity="sha384-3AB7yXWz4OeoZcPbieVW64vVXEwADiYyAEhwilzWsLw+9FgqpyjjStpPnpBO8o8S" crossorigin="anonymous">
+   <!-- font-mfizz CSS (some software icons)
+   ================================================== -->
+   <link rel="stylesheet" href="./css/font-mfizz/font-mfizz.css">
+</head>
+
+<body>
+
+   <!-- Header
+   ================================================== -->
+   <header id="home">
+
+      <nav id="nav-wrap">
+
+         <a class="mobile-btn" href="#nav-wrap" title="Show navigation">Show navigation</a>
+	      <a class="mobile-btn" href="#" title="Hide navigation">Hide navigation</a>
+
+         <ul id="nav" class="nav">
+            <li class="current"><a class="smoothscroll" href="#home">Home</a></li>
+            <li><a class="smoothscroll" href="#about" title = "Scroling down probably would've been faster than clicking this link, plus you probably spent time to read this">About</a></li>
+	         <li><a class="smoothscroll" href="#resume" title = "Just Education part and Skills part">Resume</a></li>
+            <li><a class="smoothscroll" href="#portfolio" title = "Leads to recursion">Works</a></li>
+            <!-- <li><a class="smoothscroll" href="#testimonials">Testimonials</a></li> -->
+            <!-- <li><a class="smoothscroll" href="#contact">Contact</a></li> -->
+         </ul> <!-- end #nav -->
+
+      </nav> <!-- end #nav-wrap -->
+
+      <div class="row banner">
+         <div class="banner-text">
+            <h1 class="responsive-headline" title="Congrats on finding this title text, nothing to see here">Welcome to your typical scrolly CV page</h1>
+            <h3>I'm a <span>java programmer</span>, <span>scripter</span> and <span></span> creating stuff! In general doing whatever interests me at the moment. </h3>
+            <hr />
+            <ul class="social">
+               <!-- <li><a href="#"><i class="fa fa-facebook"></i></a></li> nope not sharing this facebook is cancer-->
+               <li><a href="https://www.linkedin.com/in/allen-chonglun-c/" title ="tldr"><i class="fab fa-linkedin"></i></a></li>
+               <li><a href="https://github.com/chenc118"><i class="fab fa-github" title ="source"></i></a></li>
+            </ul>
+         </div>
+      </div>
+
+      <p class="scrolldown">
+         <a class="smoothscroll" href="#about"><i class="icon-down-circle"></i></a>
+      </p>
+
+   </header> <!-- Header End -->
+
+
+   <!-- About Section
+   ================================================== -->
+   <section id="about">
+
+      <div class="row">
+
+         <div class="three columns">
+
+            <img class="profile-pic"  src="images/profilepic.jpg" alt="" title = "Trying to keep my actual photo scarce on the internet, I think you can find it in only 2 places, maybe more that I haven't noticed"/>
+
+         </div>
+
+         <div class="nine columns main-col">
+
+            <h2>About Me</h2>
+
+            <p>I am a first year computer science student at Mcmaster University with experience using most programming paradigms. I have experience in Labview (visual based programming language), Haskell (pure functional language), Java (object oriented, imperative language) and python (dynamically typed, imperative language). I'm a self learner capable of teaching myself whatever is necessary, currently teaching myself Go, aka Golang.
+            </p>
+
+            <div class="row">
+
+               <div class="columns contact-details">
+
+                  <h2>Contact Details</h2>
+                  <p class="address" title = "Contact me via email if you really want my address, it's a bad idea to leave full thing up with all the trolls out there">
+						   <span>Allen Chen</span><br>
+						   <span> Canada ON, L3T *** <!-- Nope not getting too specific with my address on a public page -->
+                     </span><br>
+                     <span>chenc118@mcmaster.ca</span>
+					   </p>
+
+               </div>
+               <!-- 
+               <div class="columns download">
+                  <p>
+                     <a href="#" class="button"><i class="fa fa-download"></i>Download Resume</a>
+                  </p>
+               </div> -->
+
+            </div> <!-- end row -->
+
+         </div> <!-- end .main-col -->
+
+      </div>
+
+   </section> <!-- About Section End-->
+
+
+   <!-- Resume Section
+   ================================================== -->
+   <section id="resume">
+
+      <!-- Education
+      ----------------------------------------------- -->
+      <div class="row education">
+
+         <div class="three columns header-col">
+            <h1><span>Education</span></h1>
+         </div>
+
+         <div class="nine columns main-col">
+
+            <div class="row item">
+
+               <div class="twelve columns">
+
+                  <h3>Mcmaster University</h3>
+                  <p class="info">Computer Science, Bachelor of Applied Science<span>&bull;</span> <em class="date">September 2017 - present</em></p>
+
+                  <p>
+                  The education here taught me about some of the basics of computational thinking as well as programming in a functional paradigm. Languages used in courses include Haskell, Elm, Bash Scripting and Python. Practiced and expanded the range of skills I had writing the Project Analyze bash script, Elm.Agar.Io Web App.
+                  </p>
+
+               </div>
+
+            </div> <!-- item end -->
+
+         </div> <!-- main-col end -->
+
+      </div> <!-- End Education -->
+
+
+      <!-- Work
+      ----------------------------------------------- -->
+      <!-- <div class="row work">
+
+         <div class="three columns header-col">
+            <h1><span>Work</span></h1>
+         </div>
+
+         <div class="nine columns main-col">
+
+            <div class="row item">
+
+               <div class="twelve columns">
+
+                  <h3>Awesome Design Studio</h3>
+                  <p class="info">Senior UX Designer <span>&bull;</span> <em class="date">March 2010 - Present</em></p>
+
+                  <p>
+                  Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa.
+                  Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis,
+                  ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim.
+                  Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. Nullam dictum felis eu pede mollis pretium.
+                  </p>
+
+               </div>
+
+            </div> <!-- item end --
+
+            <div class="row item">
+
+               <div class="twelve columns">
+
+                  <h3>Super Cool Studio</h3>
+                  <p class="info">UX Designer <span>&bull;</span> <em class="date">March 2007 - February 2010</em></p>
+
+                  <p>
+                  This is Photoshop's version  of Lorem Ipsum. Proin gravida nibh vel velit auctor aliquet.
+                  Aenean sollicitudin, lorem quis bibendum auctor, nisi elit consequat ipsum, nec sagittis sem
+                  nibh id elit. Duis sed odio sit amet nibh vulputate cursus a sit amet mauris. Morbi accumsan
+                  ipsum velit. Nam nec tellus a odio tincidunt auctor a ornare odio. Sed non  mauris vitae erat
+                  </p>
+
+               </div>
+
+            </div> <!-- item end --
+
+         </div> <!-- main-col end --
+
+      </div> <!-- End Work --
+
+ -->
+      <!-- Skills
+      ----------------------------------------------- -->
+      <div class="row skill">
+
+         <div class="three columns header-col" title = "I suppose I'll just dump a bunch of languages I know here">
+            <h1><span>Skills</span></h1>
+         </div>
+
+         <div class="nine columns main-col">
+
+            <p>The primary language I've programmed in for the past few years is Java. I've used git for the past few years in order to keep track of the version history of my projects. Currently I am working to expand the scope of languages that I know, Golang being the current one.
+            </p>
+
+				<div class="bars">
+
+				   <ul class="skills">
+					   <li><span class="bar-expand sk85"></span><em>Java</em></li>
+                  <li><span class="bar-expand sk73"></span><em>HTML5/CSS3</em></li>
+						<li><span class="bar-expand sk60"></span><em>Elm</em></li>
+						<li><span class="bar-expand sk80"></span><em>Git</em></li>
+						<li><span class="bar-expand sk30"></span><em>Bash</em></li>
+                  <li><span class="bar-expand sk33"></span><em>Labview</em></li>
+                  <li><span class="bar-expand sk35"></span><em>Haskell</em></li>
+                  <li><span class="bar-expand sk37"></span><em>Python</em></li>
+                  <li><span class="bar-expand sk11" title = "learning this cause I found some interesting github programs using it"></span><em>Golang</em></li><!-- Planned -->
+                  <li><span class="bar-expand sk84"></span><em>Web Scraping</em></li><!-- It is only now that I realize that a lot of my projects used web scraping instead of apis (granted a lot of the info I was getting didn't have APIs)-->
+					</ul>
+
+				</div><!-- end skill-bars -->
+
+			</div> <!-- main-col end -->
+
+      </div> <!-- End skills -->
+
+   </section> <!-- Resume Section End-->
+
+
+   <!-- Portfolio Section
+   ================================================== -->
+   <section id="portfolio">
+
+      <div class="row">
+
+         <div class="twelve columns collapsed">
+
+            <h1>Various Projects</h1>
+
+            <!-- portfolio-wrapper -->
+            <div id="portfolio-wrapper" class="bgrid-quarters s-bgrid-thirds cf">
+
+          	   <div class="columns portfolio-item">
+                  <div class="item-wrap">
+
+                     <a href="#modal-01" title="">
+                        <img alt="" src="images/portfolio/FFBE-Bot.jpg">
+                        <div class="overlay">
+                           <div class="portfolio-item-meta">
+          					      <h5>FFBEBot</h5>
+                              <p>Discord Bots</p>
+          					   </div>
+                           <div class ="custom-overlay"><i class="fab fa-discord"></i><i class = "icon-java-bold"></i></div>
+                        </div>
+                        <div class="link-icon"><i class="icon-plus"></i></div>
+                     </a>
+                  </div>
+          		</div> <!-- item end -->
+
+               <div class="columns portfolio-item">
+                  <div class="item-wrap">
+
+                     <a href="#modal-02" title="">
+                        <img alt="" src="images/portfolio/Search-Bot.jpg">
+                        <div class="overlay">
+                           <div class="portfolio-item-meta">
+          					      <h5>SearchBot</h5>
+                              <p>Discord Bots</p>
+          					   </div>
+                           <div class ="custom-overlay"><i class="fab fa-discord"></i><i class = "icon-java-bold"></i></div>
+                        </div>
+                        <div class="link-icon"><i class="icon-plus"></i></div>
+                     </a>
+
+                  </div>
+          		</div> <!-- item end -->
+
+               <div class="columns portfolio-item">
+                  <div class="item-wrap">
+
+                     <a href="#modal-03" title="">
+                        <img alt="" src="images/portfolio/Remote-Bot.jpg">
+                        <div class="overlay">
+                           <div class="portfolio-item-meta">
+          					      <h5>RemoteBot</h5>
+                              <p>Discord Bots</p>
+          					   </div>
+                           <div class ="custom-overlay"><i class="fab fa-discord"></i><i class = "icon-java-bold"></i></div>
+                        </div>
+                        <div class="link-icon"><i class="icon-plus"></i></div>
+                     </a>
+
+                  </div>
+          		</div> <!-- item end -->
+
+               <div class="columns portfolio-item">
+                  <div class="item-wrap">
+
+                     <a href="#modal-04" title="">
+                        <img alt="" src="images/portfolio/Elm.Agar.Io.jpg">
+                        <div class="overlay">
+                           <div class="portfolio-item-meta">
+          					      <h5>Elm.Agar.Io</h5>
+                              <p>Web App</p>
+          					   </div>
+                           <div class ="custom-overlay"><i class="icon-elm"></i></div>
+                        </div>
+                        <div class="link-icon"><i class="icon-plus"></i></div>
+                     </a>
+
+                  </div>
+          		</div> <!-- item end -->
+
+               <div class="columns portfolio-item">
+                  <div class="item-wrap">
+
+                     <a href="#modal-05" title="">
+                        <img alt="" src="images/portfolio/ProjectAnalyze.jpg">
+                        <div class="overlay">
+                           <div class="portfolio-item-meta">
+          					      <h5>Project Analyze</h5>
+                              <p>Bash Scripting</p>
+          					   </div>
+                           <div class ="custom-overlay"><i class="icon-shell"></i></div>
+                        </div>
+                        <div class="link-icon"><i class="icon-plus"></i></div>
+                     </a>
+
+                  </div>
+          		</div> <!-- item end -->
+
+               <div class="columns portfolio-item">
+                  <div class="item-wrap">
+
+                     <a href="#modal-06" title="">
+                        <img alt="" src="images/portfolio/FRC.jpg">
+                        <div class="overlay">
+                           <div class="portfolio-item-meta">
+          					      <h5>FRC Scouting</h5>
+                              <p>Java Swing</p>
+          					   </div>
+                           <div class ="custom-overlay"><i class = "icon-java-bold"></i></div>
+                        </div>
+                        <div class="link-icon"><i class="icon-plus"></i></div>
+                     </a>
+
+                  </div>
+          		</div> <!-- item end -->
+
+               <div class="columns portfolio-item">
+                  <div class="item-wrap">
+
+                     <a href="#modal-07" title="">
+                        <img alt="" src="images/portfolio/CV.jpg">
+                        <div class="overlay">
+                           <div class="portfolio-item-meta">
+          					      <h5>CV Page</h5>
+                              <p>Web Design</p>
+          					   </div>
+                           <div class ="custom-overlay"><i class = "icon-css3"></i></div>
+                        </div>
+                        <div class="link-icon"><i class="icon-plus"></i></div>
+                     </a>
+
+                  </div>
+          		</div> <!-- item end -->
+
+               <!-- <div class="columns portfolio-item">
+                  <div class="item-wrap">
+
+                     <a href="#modal-08" title="">
+                        <img alt="" src="images/portfolio/retrocam.jpg">
+                        <div class="overlay">
+                           <div class="portfolio-item-meta">
+          					      <h5>Retrocam</h5>
+                              <p>Web Development</p>
+          					   </div>
+                        </div>
+                        <div class="link-icon"><i class="icon-plus"></i></div>
+                     </a>
+
+                  </div>
+          		</div> -->  <!-- item end -->
+
+            </div> <!-- portfolio-wrapper end -->
+
+         </div> <!-- twelve columns end -->
+
+
+         <!-- Modal Popup
+	      --------------------------------------------------------------- -->
+
+         <div id="modal-01" class="popup-modal mfp-hide">
+
+		      <img class="scale-with-grid" src="images/portfolio/modals/FFBE-Bot.png" alt="" title="I have no idea how this command didn't completely and fully break"/>
+
+		      <div class="description-box">
+			      <h4>FFBEBot</h4>
+			      <p>This is a Discord Bot programmed in Java using the JDA API  for the mobile game Final Fantasy Brave Exvius. It serves as a reference bot that can search for some generic information from the community maintained wikis. It also features a summon simulator (currently broken) that simulates a gacha in the game without having to spend real money. Development is currently suspended due to in part being busy and losing some secret files which would make recovering it take some time.</p>
+               <span class="categories"><i class="fa fa-tag"></i>Discord, Bots, Java</span>
+		      </div>
+
+            <div class="link-box">
+               <a href="https://github.com/chenc118/DiscordBot/tree/Fixes/FFBEBot">Details</a>
+		         <a class="popup-modal-dismiss">Close</a>
+            </div>
+
+	      </div><!-- modal-01 End -->
+
+         <div id="modal-02" class="popup-modal mfp-hide">
+
+		      <img class="scale-with-grid" src="images/portfolio/modals/Search.png" alt="" title="You can get an idea of the current purpose of the bot from its name, maybe"/>
+
+		      <div class="description-box">
+			      <h4>SearchBot, aka Noelv1, Your Mom</h4>
+			      <p>This is a custom Discord Bot programmed in Java using the JDA api. It was programmed at the request of a discord server owner that I'm a part of. The original functionality is to provide a custom search command demonstrated in the screenshot. Overall features are a hodgepodge of whatever the server owner wanted that was possible to program easily. </p>
+               <span class="categories"><i class="fa fa-tag"></i>Discord, Bots, Java</span>
+		      </div>
+
+            <div class="link-box">
+               <a href="https://github.com/chenc118/DiscordBot/tree/Fixes/Search">Details</a>
+		         <a class="popup-modal-dismiss">Close</a>
+            </div>
+
+	      </div><!-- modal-02 End -->
+
+         <div id="modal-03" class="popup-modal mfp-hide">
+
+		      <img class="scale-with-grid" src="images/portfolio/modals/Remote.PNG" alt="" title="Accidentally leaked channel name."/>
+
+		      <div class="description-box">
+			      <h4>RemoteBot</h4>
+			      <p>This is a custom Discord Bot programmed in Java using the JDA api. The bot is designed such that it is possible to remotely control the computer which the bot is running on through discord.</p>
+               <span class="categories"><i class="fa fa-tag"></i>Discord, Bots, Java</span>
+		      </div>
+
+            <div class="link-box">
+               <a href="https://github.com/chenc118/DiscordBot/tree/Fixes/Remote">Details</a>
+		         <a class="popup-modal-dismiss">Close</a>
+            </div>
+
+	      </div><!-- modal-03 End -->
+
+         <div id="modal-04" class="popup-modal mfp-hide">
+
+		      <img class="scale-with-grid" src="images/portfolio/modals/Elm.Agar.PNG" alt="" title="The current version that's up may differ from this a bit, hopefully not too much by the time I'm done"/>
+
+		      <div class="description-box">
+			      <h4>Elm.Agar.Io</h4>
+			      <p>A web app programmed in Elm, that seeks to somewhat simulate the game agar.io in a singleplayer environment. This project was done as a part of Assignment 2 for the CS1XA3 course at Mcmaster University. It features additional customizability that is somewhat similar to some of the mods present for the game such as allowing use of a custom image, a minimap, fps readout. </p>
+               <span class="categories"><i class="fa fa-tag"></i>Web App, Elm</span>
+		      </div>
+
+            <div class="link-box">
+               <a href="./projects/Elm.Agar.Io/index.html">Details</a>
+		         <a class="popup-modal-dismiss">Close</a>
+            </div>
+
+	      </div><!-- modal-04 End -->
+
+         <div id="modal-05" class="popup-modal mfp-hide">
+
+		      <img class="scale-with-grid" src="images/portfolio/modals/ProjectAnalyze.png" alt="" title="Image picked based on whichever part had the most code to just fill the screen"/>
+
+		      <div class="description-box">
+			      <h4>Project Analyze</h4>
+			      <p>This is a bash script that is designed to provide a general overview of a git project. This was programmed as a part of Assignment 1 of the CS1XA3 course. It is designed such that it is easy to invoke externally by another program or a scheduler like Windows Task Scheduler, or AppleScript. </p>
+               <span class="categories"><i class="fa fa-tag"></i>Bash, Scripting</span>
+		      </div>
+
+            <div class="link-box">
+               <a href="https://raw.githubusercontent.com/chenc118/CS1XA3/master/Assign1/ProjectAnalyze.sh">Details</a>
+		         <a class="popup-modal-dismiss">Close</a>
+            </div>
+
+	      </div><!-- modal-05 End -->
+
+         <div id="modal-06" class="popup-modal mfp-hide">
+
+		      <img class="scale-with-grid" src="images/portfolio/modals/Scouter.png" alt="" title = "Looking back at it I'm surprised at its complexity, you can literally edit everything and there's so many parameters, debug info...really should've written documentation"/>
+
+		      <div class="description-box">
+			      <h4>FRC Scouting</h4>
+			      <p>Various programs developed independently to help scouting in FRC, first one built during competitions in &lt;100 hours. Most were developed using Java using java swing. Developed UI design skills from mistakes made, i.e. principles to follow, how to layout things. Third and final series of scouting programs ended up being more and more like databases. Displayed is the Editable Scouter program.</p>
+               <span class="categories"><i class="fa fa-tag"></i>Java, Swing, FRC</span>
+		      </div>
+
+            <div class="link-box">
+               <a href="https://github.com/chenc118/Scouting-Projects">Details</a>
+		         <a class="popup-modal-dismiss">Close</a>
+            </div>
+
+	      </div><!-- modal-06 End -->
+
+         <div id="modal-07" class="popup-modal mfp-hide">
+
+		      <img class="scale-with-grid" src="images/portfolio/modals/CV.png" alt="" title="If you look closely you can see what the default image was"/>
+
+		      <div class="description-box">
+			      <h4>CV Page</h4>
+			      <p>The obligatory recursive project tile to create an endless recursive loop of links. Clicking on the details button will link right back to this page. This page was initially developed as a part of Assignment 2 of the CS1XA3 course. </p>
+               <span class="categories"><i class="fa fa-tag"></i>HTML5, CSS3, Recursive</span>
+		      </div>
+
+            <div class="link-box">
+               <a href="./index.html" title = "A very short looping recursive link, if you have an especially bad web crawler">Details</a>
+		         <a class="popup-modal-dismiss" title = "click on details it'll essentially do the same thing">Close</a>
+            </div>
+
+	      </div><!-- modal-07 End -->
+
+         <div id="modal-08" class="popup-modal mfp-hide">
+
+		      <img class="scale-with-grid" src="images/portfolio/modals/m-retrocam.jpg" alt="" />
+
+		      <div class="description-box">
+			      <h4>Retrocam</h4>
+			      <p>Proin gravida nibh vel velit auctor aliquet. Aenean sollicitudin, lorem quis bibendum auctor, nisi elit consequat ipsum, nec sagittis sem nibh id elit.</p>
+               <span class="categories"><i class="fa fa-tag"></i>Webdesign, Photography</span>
+		      </div>
+
+            <div class="link-box">
+               <a href="http://www.behance.net">Details</a>
+		         <a class="popup-modal-dismiss">Close</a>
+            </div>
+
+	      </div><!-- modal-01 End -->
+
+
+      </div> <!-- row End -->
+
+   </section> <!-- Portfolio Section End-->
+
+   <!-- footer
+   ================================================== -->
+   <footer>
+
+      <div class="row">
+
+         <div class="twelve columns">
+
+            <ul class="social-links">
+               <!-- <li><a href="#"><i class="fa fa-facebook"></i></a></li>  --><!-- Nope not revealing this, facebook is cancer -->
+               <!-- <li><a href="#"><i class="fa fa-twitter"></i></a></li> -->
+               <!-- <li><a href="#"><i class="fa fa-google-plus"></i></a></li> -->
+               <li><a href="https://www.linkedin.com/in/allen-chonglun-c/" tile = "linkedin, click maybe?"><i class="fab fa-linkedin"></i></a></li>
+               <li><a href="https://github.com/chenc118"><i class="fab fa-github" title = "github, click maybe?"></i></a></li>
+               <!-- <li><a href="#"><i class="fa fa-instagram"></i></a></li> -->
+               <!-- <li><a href="#"><i class="fa fa-dribbble"></i></a></li> -->
+               <!-- <li><a href="#"><i class="fa fa-skype"></i></a></li> -->
+            </ul>
+
+            <ul class="copyright" title = "Random title text inspired by XKCD">
+               <li>&copy; Copyright 2014 CeeVee</li>
+               <li>Design by <a title="Styleshout" href="http://www.styleshout.com/">Styleshout</a></li>   
+            </ul>
+
+         </div>
+
+         <div id="go-top"><a class="smoothscroll" title="Back to Top" href="#home"><i class="icon-up-open"></i></a></div>
+
+      </div>
+
+   </footer> <!-- Footer End-->
+
+   <!-- Java Script
+   ================================================== -->
+   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+   <script>window.jQuery || document.write('<script src="js/jquery-1.10.2.min.js"><\/script>')</script>
+   <script type="text/javascript" src="js/jquery-migrate-1.2.1.min.js"></script>
+
+   <script src="js/jquery.flexslider.js"></script>
+   <script src="js/waypoints.js"></script>
+   <script src="js/jquery.fittext.js"></script>
+   <script src="js/magnific-popup.js"></script>
+   <script src="js/init.js"></script>
+
+</body>
+
 </html>
