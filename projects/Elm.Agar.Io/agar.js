@@ -10374,19 +10374,11 @@ var _jinjor$elm_inline_hover$InlineHover$hover = F4(
 var _user$project$Main$pButtonHover = _jinjor$elm_inline_hover$InlineHover$hover(
 	{
 		ctor: '::',
-		_0: {ctor: '_Tuple2', _0: 'font-size', _1: '52px'},
+		_0: {ctor: '_Tuple2', _0: 'color', _1: '#ffdf00'},
 		_1: {
 			ctor: '::',
-			_0: {ctor: '_Tuple2', _0: 'color', _1: '#ffdf00'},
-			_1: {
-				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: 'padding-top', _1: '0px'},
-				_1: {
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'padding-bottom', _1: '0px'},
-					_1: {ctor: '[]'}
-				}
-			}
+			_0: {ctor: '_Tuple2', _0: 'transform', _1: 'scale(1.2)'},
+			_1: {ctor: '[]'}
 		}
 	});
 var _user$project$Main$pButtonStyleList = {
@@ -10415,14 +10407,18 @@ var _user$project$Main$pButtonStyleList = {
 								_0: {ctor: '_Tuple2', _0: 'vertical-align', _1: 'middle'},
 								_1: {
 									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'text-shadow', _1: '-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000'},
+									_0: {ctor: '_Tuple2', _0: 'transition', _1: 'all 0.2s ease-in-out'},
 									_1: {
 										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'padding-top', _1: '1px'},
+										_0: {ctor: '_Tuple2', _0: 'text-shadow', _1: '-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000'},
 										_1: {
 											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: 'padding-bottom', _1: '1px'},
-											_1: {ctor: '[]'}
+											_0: {ctor: '_Tuple2', _0: 'padding-top', _1: '1px'},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'padding-bottom', _1: '1px'},
+												_1: {ctor: '[]'}
+											}
 										}
 									}
 								}

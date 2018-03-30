@@ -453,14 +453,17 @@ pButtonStyleList = [("display","block")
                                 ,("color","#FFF")
                                 ,("opacity","1")
                                 ,("vertical-align","middle")
+                                ,("transition","all 0.2s ease-in-out")
                                 --black color stroke from https://stackoverflow.com/questions/4919076/outline-effect-to-text?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
                                 ,("text-shadow","-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000")
                                 ,("padding-top","1px")--stuff so that slight grow doesn't alter position
                                 ,("padding-bottom","1px")]
-pButtonHover = InlineHover.hover[("font-size","52px")
-                                ,("color","#ffdf00")--stole the hover sort of style from terraria
-                                ,("padding-top","0px")
-                                ,("padding-bottom","0px")]
+pButtonHover = InlineHover.hover[--("font-size","52px")
+                                ("color","#ffdf00")--stole the hover sort of style from terraria
+                                --,("padding-top","0px")
+                                --,("padding-bottom","0px")
+                                ,("transform","scale(1.2)")
+                                ]
 -- overlay for the pause menu
 --pauseView : Model -> Html Msg
 --align pausemenu in center https://stackoverflow.com/questions/356809/best-way-to-center-a-div-on-a-page-vertically-and-horizontally/18618259#18618259
