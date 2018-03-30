@@ -10221,6 +10221,238 @@ var _elm_lang$window$Window$subMap = F2(
 	});
 _elm_lang$core$Native_Platform.effectManagers['Window'] = {pkg: 'elm-lang/window', init: _elm_lang$window$Window$init, onEffects: _elm_lang$window$Window$onEffects, onSelfMsg: _elm_lang$window$Window$onSelfMsg, tag: 'sub', subMap: _elm_lang$window$Window$subMap};
 
+var _jinjor$elm_inline_hover$InlineHover$isValidChars = function (list) {
+	isValidChars:
+	while (true) {
+		var _p0 = list;
+		if (_p0.ctor === '::') {
+			var _p1 = _p0._0;
+			if (_elm_lang$core$Char$isLower(_p1) || _elm_lang$core$Native_Utils.eq(
+				_p1,
+				_elm_lang$core$Native_Utils.chr('-'))) {
+				var _v1 = _p0._1;
+				list = _v1;
+				continue isValidChars;
+			} else {
+				return false;
+			}
+		} else {
+			return true;
+		}
+	}
+};
+var _jinjor$elm_inline_hover$InlineHover$isValidKey = function (s) {
+	return (!_elm_lang$core$Native_Utils.eq(s, '')) && (A2(
+		_elm_lang$core$List$any,
+		_elm_lang$core$Char$isLower,
+		_elm_lang$core$String$toList(s)) && A2(
+		_elm_lang$core$List$all,
+		function (c) {
+			return _elm_lang$core$Char$isLower(c) || _elm_lang$core$Native_Utils.eq(
+				c,
+				_elm_lang$core$Native_Utils.chr('-'));
+		},
+		_elm_lang$core$String$toList(s)));
+};
+var _jinjor$elm_inline_hover$InlineHover$toCamelCase = function (s) {
+	return _elm_lang$core$String$fromList(
+		_elm_lang$core$List$reverse(
+			_elm_lang$core$Tuple$second(
+				A3(
+					_elm_lang$core$List$foldl,
+					F2(
+						function (c, _p2) {
+							var _p3 = _p2;
+							var _p4 = _p3._1;
+							return _elm_lang$core$Native_Utils.eq(
+								c,
+								_elm_lang$core$Native_Utils.chr('-')) ? {ctor: '_Tuple2', _0: true, _1: _p4} : (_p3._0 ? {
+								ctor: '_Tuple2',
+								_0: false,
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$core$Char$toUpper(c),
+									_1: _p4
+								}
+							} : {
+								ctor: '_Tuple2',
+								_0: false,
+								_1: {ctor: '::', _0: c, _1: _p4}
+							});
+						}),
+					{
+						ctor: '_Tuple2',
+						_0: false,
+						_1: {ctor: '[]'}
+					},
+					_elm_lang$core$String$toList(s)))));
+};
+var _jinjor$elm_inline_hover$InlineHover$enterEach = function (_p5) {
+	var _p6 = _p5;
+	var _p8 = _p6._0;
+	var escapedValue = function (_p7) {
+		return A2(
+			_elm_lang$core$String$join,
+			'\"',
+			A2(_elm_lang$core$String$split, '\'', _p7));
+	}(_p6._1);
+	var keyCamel = _jinjor$elm_inline_hover$InlineHover$toCamelCase(_p8);
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		'this.setAttribute(\'data-hover-',
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			_p8,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'\', this.style.',
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					keyCamel,
+					A2(
+						_elm_lang$core$Basics_ops['++'],
+						'||\'\');',
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							'this.style.',
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								keyCamel,
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									'=\'',
+									A2(_elm_lang$core$Basics_ops['++'], escapedValue, '\'')))))))));
+};
+var _jinjor$elm_inline_hover$InlineHover$leaveEach = function (_p9) {
+	var _p10 = _p9;
+	var _p11 = _p10._0;
+	var keyCamel = _jinjor$elm_inline_hover$InlineHover$toCamelCase(_p11);
+	return A2(
+		_elm_lang$core$Basics_ops['++'],
+		'this.style.',
+		A2(
+			_elm_lang$core$Basics_ops['++'],
+			keyCamel,
+			A2(
+				_elm_lang$core$Basics_ops['++'],
+				'=this.getAttribute(\'data-hover-',
+				A2(_elm_lang$core$Basics_ops['++'], _p11, '\')||\'\';'))));
+};
+var _jinjor$elm_inline_hover$InlineHover$hover = F4(
+	function (styles, tag, attrs, children) {
+		var validStyles = A2(
+			_elm_lang$core$List$filter,
+			function (_p12) {
+				var _p13 = _p12;
+				return _jinjor$elm_inline_hover$InlineHover$isValidKey(_p13._0);
+			},
+			styles);
+		var enter = A2(
+			_elm_lang$html$Html_Attributes$attribute,
+			'onmouseenter',
+			A2(
+				_elm_lang$core$String$join,
+				';',
+				A2(_elm_lang$core$List$map, _jinjor$elm_inline_hover$InlineHover$enterEach, validStyles)));
+		var leave = A2(
+			_elm_lang$html$Html_Attributes$attribute,
+			'onmouseleave',
+			A2(
+				_elm_lang$core$String$join,
+				';',
+				A2(_elm_lang$core$List$map, _jinjor$elm_inline_hover$InlineHover$leaveEach, validStyles)));
+		return A2(
+			tag,
+			{
+				ctor: '::',
+				_0: enter,
+				_1: {ctor: '::', _0: leave, _1: attrs}
+			},
+			children);
+	});
+
+var _user$project$Main$pButtonHover = _jinjor$elm_inline_hover$InlineHover$hover(
+	{
+		ctor: '::',
+		_0: {ctor: '_Tuple2', _0: 'font-size', _1: '3.1em'},
+		_1: {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'color', _1: '#ffdf00'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'padding-top', _1: '0.1153em'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'padding-bottom', _1: '0.1153em'},
+					_1: {ctor: '[]'}
+				}
+			}
+		}
+	});
+var _user$project$Main$pButtonStyleList = {
+	ctor: '::',
+	_0: {ctor: '_Tuple2', _0: 'display', _1: 'block'},
+	_1: {
+		ctor: '::',
+		_0: {ctor: '_Tuple2', _0: 'margin', _1: 'auto'},
+		_1: {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'background', _1: 'none'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'border', _1: 'none'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'font-size', _1: '3em'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'color', _1: '#FFF'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'opacity', _1: '1'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'vertical-align', _1: 'middle'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'text-shadow', _1: '-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000'},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'padding-top', _1: '0.15em'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'padding-bottom', _1: '0.15em'},
+											_1: {ctor: '[]'}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+};
+var _user$project$Main$pButtonStyle = _elm_lang$html$Html_Attributes$style(_user$project$Main$pButtonStyleList);
+var _user$project$Main$textStyle = _elm_lang$html$Html_Attributes$style(
+	{
+		ctor: '::',
+		_0: {ctor: '_Tuple2', _0: 'border', _1: '1px solid #ccc'},
+		_1: {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'box-shadow', _1: 'inset 0 1px 1px rgba(0,0,0,.075)'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'transition', _1: 'border-color ease-in-out .15s,box-shadow ease-in-out .15s;'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'border-radius', _1: '4px'},
+					_1: {ctor: '[]'}
+				}
+			}
+		}
+	});
 var _user$project$Main$radioStyle = _elm_lang$html$Html_Attributes$style(
 	{
 		ctor: '::',
@@ -10639,530 +10871,6 @@ var _user$project$Main$genViewBox = F2(
 								vw,
 								A2(_elm_lang$core$Basics_ops['++'], ' ', vh)))))));
 	});
-var _user$project$Main$gameView = function (model) {
-	var _p12 = A2(
-		_user$project$Main$genVBox,
-		_user$project$Main$mr(model.size),
-		{ctor: '_Tuple2', _0: model.x, _1: model.y});
-	var vx1 = _p12._0;
-	var vy1 = _p12._1;
-	var vw = _p12._2;
-	var vh = _p12._3;
-	var gridlines = _user$project$Main$drawLines;
-	var vBox = A2(
-		_user$project$Main$genViewBox,
-		_user$project$Main$mr(model.size),
-		{ctor: '_Tuple2', _0: model.x, _1: model.y});
-	var pImage = function () {
-		var _p13 = model.display;
-		if (_p13.ctor === 'LS') {
-			return A2(
-				_elm_lang$svg$Svg$image,
-				{ctor: '[]'},
-				{ctor: '[]'});
-		} else {
-			return A2(
-				_elm_lang$svg$Svg$image,
-				{
-					ctor: '::',
-					_0: _elm_lang$svg$Svg_Attributes$x('0%'),
-					_1: {
-						ctor: '::',
-						_0: _elm_lang$svg$Svg_Attributes$y('0%'),
-						_1: {
-							ctor: '::',
-							_0: _elm_lang$svg$Svg_Attributes$height('5000'),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$svg$Svg_Attributes$width('5000'),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$svg$Svg_Attributes$xlinkHref(_p13._0.source),
-									_1: {ctor: '[]'}
-								}
-							}
-						}
-					}
-				},
-				{ctor: '[]'});
-		}
-	}();
-	var pfill = function () {
-		var _p14 = model.display;
-		if (_p14.ctor === 'LS') {
-			return _p14._0;
-		} else {
-			return 'url(#player)';
-		}
-	}();
-	var feeds = _user$project$Main$buildFeeds(model.feed);
-	var posY = _elm_lang$core$Basics$toString(model.y);
-	var posX = _elm_lang$core$Basics$toString(model.x);
-	return A2(
-		_elm_lang$html$Html$div,
-		{
-			ctor: '::',
-			_0: _elm_lang$html$Html_Attributes$style(
-				{
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'margin', _1: '0'},
-					_1: {
-						ctor: '::',
-						_0: {ctor: '_Tuple2', _0: 'padding', _1: '0'},
-						_1: {
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'overflow', _1: 'hidden'},
-							_1: {ctor: '[]'}
-						}
-					}
-				}),
-			_1: {ctor: '[]'}
-		},
-		{
-			ctor: '::',
-			_0: A2(
-				_elm_lang$svg$Svg$svg,
-				{
-					ctor: '::',
-					_0: _elm_lang$html$Html_Attributes$style(
-						{
-							ctor: '::',
-							_0: {ctor: '_Tuple2', _0: 'position', _1: 'fixed'},
-							_1: {
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'top', _1: '0'},
-								_1: {
-									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'left', _1: '0'},
-									_1: {
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'height', _1: '100%'},
-										_1: {
-											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: 'width', _1: '100%'},
-											_1: {ctor: '[]'}
-										}
-									}
-								}
-							}
-						}),
-					_1: {
-						ctor: '::',
-						_0: vBox,
-						_1: {ctor: '[]'}
-					}
-				},
-				A2(
-					_elm_lang$core$Basics_ops['++'],
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$svg$Svg$defs,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$svg$Svg$pattern,
-									{
-										ctor: '::',
-										_0: _elm_lang$svg$Svg_Attributes$id('player'),
-										_1: {
-											ctor: '::',
-											_0: _elm_lang$svg$Svg_Attributes$x('0%'),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$svg$Svg_Attributes$y('0%'),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$svg$Svg_Attributes$height('100%'),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$svg$Svg_Attributes$width('100%'),
-														_1: {
-															ctor: '::',
-															_0: _elm_lang$svg$Svg_Attributes$viewBox('0 0 5000 5000'),
-															_1: {ctor: '[]'}
-														}
-													}
-												}
-											}
-										}
-									},
-									{
-										ctor: '::',
-										_0: pImage,
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					},
-					A2(
-						_elm_lang$core$Basics_ops['++'],
-						gridlines,
-						A2(
-							_elm_lang$core$Basics_ops['++'],
-							feeds(1),
-							A2(
-								_elm_lang$core$Basics_ops['++'],
-								{
-									ctor: '::',
-									_0: A2(
-										_elm_lang$svg$Svg$circle,
-										{
-											ctor: '::',
-											_0: _elm_lang$svg$Svg_Attributes$cx(posX),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$svg$Svg_Attributes$cy(posY),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$svg$Svg_Attributes$r(
-														_elm_lang$core$Basics$toString(
-															_user$project$Main$mr(model.size))),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$svg$Svg_Attributes$fill(pfill),
-														_1: {
-															ctor: '::',
-															_0: _elm_lang$svg$Svg_Attributes$stroke('black'),
-															_1: {
-																ctor: '::',
-																_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1px'),
-																_1: {ctor: '[]'}
-															}
-														}
-													}
-												}
-											}
-										},
-										{ctor: '[]'}),
-									_1: {ctor: '[]'}
-								},
-								{
-									ctor: '::',
-									_0: A2(
-										_elm_lang$svg$Svg$text_,
-										{
-											ctor: '::',
-											_0: _elm_lang$svg$Svg_Attributes$x(posX),
-											_1: {
-												ctor: '::',
-												_0: _elm_lang$svg$Svg_Attributes$y(posY),
-												_1: {
-													ctor: '::',
-													_0: _elm_lang$svg$Svg_Attributes$textAnchor('middle'),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$svg$Svg_Attributes$alignmentBaseline('middle'),
-														_1: {
-															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$style(
-																{
-																	ctor: '::',
-																	_0: {
-																		ctor: '_Tuple2',
-																		_0: 'font-size',
-																		_1: A2(
-																			_elm_lang$core$Basics_ops['++'],
-																			_elm_lang$core$Basics$toString(
-																				_user$project$Main$mr(model.size) / 2),
-																			'px')
-																	},
-																	_1: {
-																		ctor: '::',
-																		_0: {ctor: '_Tuple2', _0: 'font-weight', _1: 'bold'},
-																		_1: {
-																			ctor: '::',
-																			_0: {ctor: '_Tuple2', _0: 'fill', _1: 'white'},
-																			_1: {
-																				ctor: '::',
-																				_0: {ctor: '_Tuple2', _0: 'fill-opacity', _1: '1'},
-																				_1: {
-																					ctor: '::',
-																					_0: {ctor: '_Tuple2', _0: 'stroke', _1: '#000'},
-																					_1: {
-																						ctor: '::',
-																						_0: {
-																							ctor: '_Tuple2',
-																							_0: 'stroke-width',
-																							_1: A2(
-																								_elm_lang$core$Basics_ops['++'],
-																								_elm_lang$core$Basics$toString(
-																									_user$project$Main$mr(model.size) / 50),
-																								'px')
-																						},
-																						_1: {
-																							ctor: '::',
-																							_0: {ctor: '_Tuple2', _0: 'stroke-linecap', _1: 'butt'},
-																							_1: {
-																								ctor: '::',
-																								_0: {ctor: '_Tuple2', _0: 'stroke-linejoin', _1: 'miter'},
-																								_1: {
-																									ctor: '::',
-																									_0: {ctor: '_Tuple2', _0: 'stroke-opacity', _1: '1'},
-																									_1: {
-																										ctor: '::',
-																										_0: {ctor: '_Tuple2', _0: 'font-family', _1: 'Sans-Serif'},
-																										_1: {ctor: '[]'}
-																									}
-																								}
-																							}
-																						}
-																					}
-																				}
-																			}
-																		}
-																	}
-																}),
-															_1: {ctor: '[]'}
-														}
-													}
-												}
-											}
-										},
-										{
-											ctor: '::',
-											_0: _elm_lang$svg$Svg$text(model.name),
-											_1: {ctor: '[]'}
-										}),
-									_1: {ctor: '[]'}
-								}))))),
-			_1: {
-				ctor: '::',
-				_0: A2(
-					_elm_lang$html$Html$div,
-					{
-						ctor: '::',
-						_0: _elm_lang$html$Html_Attributes$style(
-							{
-								ctor: '::',
-								_0: {ctor: '_Tuple2', _0: 'position', _1: 'fixed'},
-								_1: {
-									ctor: '::',
-									_0: {ctor: '_Tuple2', _0: 'bottom', _1: '1%'},
-									_1: {
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'left', _1: '1%'},
-										_1: {
-											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: 'color', _1: 'white'},
-											_1: {
-												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'darkgrey'},
-												_1: {
-													ctor: '::',
-													_0: {ctor: '_Tuple2', _0: 'opacity', _1: '0.7'},
-													_1: {ctor: '[]'}
-												}
-											}
-										}
-									}
-								}
-							}),
-						_1: {ctor: '[]'}
-					},
-					{
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$strong,
-							{ctor: '[]'},
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html$text(
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										'Score: ',
-										_elm_lang$core$Basics$toString(
-											_elm_lang$core$Basics$round(model.size - 25)))),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}),
-				_1: {
-					ctor: '::',
-					_0: A2(
-						_elm_lang$html$Html$div,
-						{
-							ctor: '::',
-							_0: _elm_lang$html$Html_Attributes$hidden(!model.fps),
-							_1: {
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$style(
-									{
-										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'position', _1: 'fixed'},
-										_1: {
-											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: 'top', _1: '1%'},
-											_1: {
-												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: 'left', _1: '1%'},
-												_1: {
-													ctor: '::',
-													_0: {ctor: '_Tuple2', _0: 'color', _1: 'white'},
-													_1: {
-														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'darkgrey'},
-														_1: {
-															ctor: '::',
-															_0: {ctor: '_Tuple2', _0: 'opacity', _1: '0.7'},
-															_1: {ctor: '[]'}
-														}
-													}
-												}
-											}
-										}
-									}),
-								_1: {ctor: '[]'}
-							}
-						},
-						{
-							ctor: '::',
-							_0: A2(
-								_elm_lang$html$Html$strong,
-								{ctor: '[]'},
-								{
-									ctor: '::',
-									_0: _elm_lang$html$Html$text(
-										A2(
-											_elm_lang$core$Basics_ops['++'],
-											'FPS: ',
-											_elm_lang$core$Basics$toString(
-												_elm_lang$core$Basics$round(model.tickRate)))),
-									_1: {ctor: '[]'}
-								}),
-							_1: {ctor: '[]'}
-						}),
-					_1: {
-						ctor: '::',
-						_0: A2(
-							_elm_lang$html$Html$div,
-							{
-								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$hidden(!model.minimap),
-								_1: {
-									ctor: '::',
-									_0: _elm_lang$html$Html_Attributes$style(
-										{
-											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: 'position', _1: 'fixed'},
-											_1: {
-												ctor: '::',
-												_0: {ctor: '_Tuple2', _0: 'bottom', _1: '1%'},
-												_1: {
-													ctor: '::',
-													_0: {ctor: '_Tuple2', _0: 'right', _1: '1%'},
-													_1: {
-														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: 'height', _1: '10%'},
-														_1: {
-															ctor: '::',
-															_0: {ctor: '_Tuple2', _0: 'width', _1: '10%'},
-															_1: {ctor: '[]'}
-														}
-													}
-												}
-											}
-										}),
-									_1: {ctor: '[]'}
-								}
-							},
-							{
-								ctor: '::',
-								_0: A2(
-									_elm_lang$svg$Svg$svg,
-									{
-										ctor: '::',
-										_0: _elm_lang$svg$Svg_Attributes$viewBox(
-											A2(
-												_elm_lang$core$Basics_ops['++'],
-												'0 0 ',
-												A2(
-													_elm_lang$core$Basics_ops['++'],
-													_elm_lang$core$Basics$toString(_user$project$Main$svWidth),
-													A2(
-														_elm_lang$core$Basics_ops['++'],
-														' ',
-														_elm_lang$core$Basics$toString(_user$project$Main$svHeight))))),
-										_1: {ctor: '[]'}
-									},
-									A2(
-										_elm_lang$core$Basics_ops['++'],
-										{
-											ctor: '::',
-											_0: A2(
-												_elm_lang$svg$Svg$rect,
-												{
-													ctor: '::',
-													_0: _elm_lang$svg$Svg_Attributes$x('0'),
-													_1: {
-														ctor: '::',
-														_0: _elm_lang$svg$Svg_Attributes$y('0'),
-														_1: {
-															ctor: '::',
-															_0: _elm_lang$svg$Svg_Attributes$height(
-																_elm_lang$core$Basics$toString(_user$project$Main$svHeight)),
-															_1: {
-																ctor: '::',
-																_0: _elm_lang$svg$Svg_Attributes$width(
-																	_elm_lang$core$Basics$toString(_user$project$Main$svWidth)),
-																_1: {
-																	ctor: '::',
-																	_0: _elm_lang$svg$Svg_Attributes$fill('white'),
-																	_1: {
-																		ctor: '::',
-																		_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1%'),
-																		_1: {
-																			ctor: '::',
-																			_0: _elm_lang$svg$Svg_Attributes$stroke('black'),
-																			_1: {ctor: '[]'}
-																		}
-																	}
-																}
-															}
-														}
-													}
-												},
-												{ctor: '[]'}),
-											_1: {
-												ctor: '::',
-												_0: A2(
-													_elm_lang$svg$Svg$rect,
-													{
-														ctor: '::',
-														_0: _elm_lang$svg$Svg_Attributes$x(vx1),
-														_1: {
-															ctor: '::',
-															_0: _elm_lang$svg$Svg_Attributes$y(vy1),
-															_1: {
-																ctor: '::',
-																_0: _elm_lang$svg$Svg_Attributes$width(vw),
-																_1: {
-																	ctor: '::',
-																	_0: _elm_lang$svg$Svg_Attributes$height(vh),
-																	_1: {
-																		ctor: '::',
-																		_0: _elm_lang$svg$Svg_Attributes$fill(pfill),
-																		_1: {ctor: '[]'}
-																	}
-																}
-															}
-														}
-													},
-													{ctor: '[]'}),
-												_1: {ctor: '[]'}
-											}
-										},
-										feeds(5))),
-								_1: {ctor: '[]'}
-							}),
-						_1: {ctor: '[]'}
-					}
-				}
-			}
-		});
-};
 var _user$project$Main$boundsCheck = F3(
 	function (b, pos, rad) {
 		var bounds = _elm_lang$core$Basics$toFloat(b);
@@ -11191,21 +10899,21 @@ var _user$project$Main$scCenter = function (model) {
 };
 var _user$project$Main$pow = F2(
 	function (x, num) {
-		var _p15 = num;
-		if (_p15 === 0) {
+		var _p12 = num;
+		if (_p12 === 0) {
 			return 1;
 		} else {
 			return x * A2(_user$project$Main$pow, x, num - 1);
 		}
 	});
 var _user$project$Main$mouseSpeed = F3(
-	function (_p17, _p16, speed) {
-		var _p18 = _p17;
-		var _p19 = _p16;
-		var my = _elm_lang$core$Basics$toFloat(_p19._1);
-		var ry = 1.0e-2 * (my - _p18._1);
-		var mx = _elm_lang$core$Basics$toFloat(_p19._0);
-		var rx = 1.0e-2 * (mx - _p18._0);
+	function (_p14, _p13, speed) {
+		var _p15 = _p14;
+		var _p16 = _p13;
+		var my = _elm_lang$core$Basics$toFloat(_p16._1);
+		var ry = 1.0e-2 * (my - _p15._1);
+		var mx = _elm_lang$core$Basics$toFloat(_p16._0);
+		var rx = 1.0e-2 * (mx - _p15._0);
 		var r = _elm_lang$core$Basics$sqrt(
 			A2(_user$project$Main$pow, rx, 2) + A2(_user$project$Main$pow, ry, 2));
 		var ds = ((_elm_lang$core$Native_Utils.cmp(r, speed) > 0) || _elm_lang$core$Basics$isNaN(r)) ? speed : r;
@@ -11215,9 +10923,9 @@ var _user$project$Main$mouseSpeed = F3(
 		return {ctor: '_Tuple2', _0: dx, _1: dy};
 	});
 var _user$project$Main$incNum = 10;
-var _user$project$Main$extractMod = function (_p20) {
-	var _p21 = _p20;
-	return _p21._0;
+var _user$project$Main$extractMod = function (_p17) {
+	var _p18 = _p17;
+	return _p18._0;
 };
 var _user$project$Main$Feed = F4(
 	function (a, b, c, d) {
@@ -11272,16 +10980,51 @@ var _user$project$Main$RS = function (a) {
 	return {ctor: 'RS', _0: a};
 };
 var _user$project$Main$updatePlayerDisplay = function (du) {
-	var _p22 = du;
-	if (_p22.ctor === 'LS') {
-		return _user$project$Main$LS(_p22._0);
+	var _p19 = du;
+	if (_p19.ctor === 'LS') {
+		return _user$project$Main$LS(_p19._0);
 	} else {
 		return _user$project$Main$RS(
-			{source: _p22._0});
+			{source: _p19._0});
 	}
 };
 var _user$project$Main$Keys = {ctor: 'Keys'};
 var _user$project$Main$Mouse = {ctor: 'Mouse'};
+var _user$project$Main$Adjust = {ctor: 'Adjust'};
+var _user$project$Main$Pause = {ctor: 'Pause'};
+var _user$project$Main$pauseGame = function (model) {
+	return _elm_lang$core$Native_Utils.update(
+		model,
+		{inGame: _user$project$Main$Pause});
+};
+var _user$project$Main$Pre = {ctor: 'Pre'};
+var _user$project$Main$Play = {ctor: 'Play'};
+var _user$project$Main$escKey = function (model) {
+	var _p20 = model.inGame;
+	switch (_p20.ctor) {
+		case 'Pause':
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					model,
+					{inGame: _user$project$Main$Play}),
+				_1: _elm_lang$core$Platform_Cmd$none
+			};
+		case 'Play':
+			return {
+				ctor: '_Tuple2',
+				_0: _elm_lang$core$Native_Utils.update(
+					model,
+					{inGame: _user$project$Main$Pause}),
+				_1: _elm_lang$core$Platform_Cmd$none
+			};
+		default:
+			return A2(
+				_elm_lang$core$Platform_Cmd_ops['!'],
+				model,
+				{ctor: '[]'});
+	}
+};
 var _user$project$Main$Toggle = function (a) {
 	return {ctor: 'Toggle', _0: a};
 };
@@ -11313,7 +11056,7 @@ var _user$project$Main$init = {
 		minimap: true,
 		tickFrames: {first: 0, count: 0},
 		tickRate: 0,
-		inGame: false
+		inGame: _user$project$Main$Pre
 	},
 	_1: A2(_elm_lang$core$Task$perform, _user$project$Main$UpdateWinSize, _elm_lang$window$Window$size)
 };
@@ -11321,9 +11064,708 @@ var _user$project$Main$resetGame = function (model) {
 	var initial = _user$project$Main$extractMod(_user$project$Main$init);
 	return _elm_lang$core$Native_Utils.update(
 		model,
-		{x: initial.x, y: initial.y, feed: initial.feed, size: initial.size, inGame: false});
+		{x: initial.x, y: initial.y, feed: initial.feed, size: initial.size, inGame: _user$project$Main$Pre});
 };
-var _user$project$Main$StartG = {ctor: 'StartG'};
+var _user$project$Main$UpdateGame = function (a) {
+	return {ctor: 'UpdateGame', _0: a};
+};
+var _user$project$Main$pauseView = function (model) {
+	return A2(
+		_elm_lang$html$Html$div,
+		{
+			ctor: '::',
+			_0: _elm_lang$html$Html_Attributes$style(
+				{
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'display', _1: 'flex'},
+					_1: {
+						ctor: '::',
+						_0: {ctor: '_Tuple2', _0: 'position', _1: 'absolute'},
+						_1: {
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'align-items', _1: 'center'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'justify-content', _1: 'center'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'top', _1: '0'},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'right', _1: '0'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'width', _1: '100%'},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'height', _1: '100%'},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'rgba(128,128,128,0.5)'},
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}),
+			_1: {ctor: '[]'}
+		},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$style(
+						{
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'display', _1: 'inline-block'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'text-align', _1: 'center'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'vertical-align', _1: 'middle'},
+									_1: {ctor: '[]'}
+								}
+							}
+						}),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A3(
+						_user$project$Main$pButtonHover,
+						_elm_lang$html$Html$button,
+						{
+							ctor: '::',
+							_0: _user$project$Main$pButtonStyle,
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$html$Html_Events$onClick(
+									_user$project$Main$UpdateGame(_user$project$Main$Play)),
+								_1: {ctor: '[]'}
+							}
+						},
+						{
+							ctor: '::',
+							_0: _elm_lang$svg$Svg$text('Resume'),
+							_1: {ctor: '[]'}
+						}),
+					_1: {
+						ctor: '::',
+						_0: A3(
+							_user$project$Main$pButtonHover,
+							_elm_lang$html$Html$button,
+							{
+								ctor: '::',
+								_0: _user$project$Main$pButtonStyle,
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$html$Html_Events$onClick(
+										_user$project$Main$UpdateGame(_user$project$Main$Adjust)),
+									_1: {ctor: '[]'}
+								}
+							},
+							{
+								ctor: '::',
+								_0: _elm_lang$svg$Svg$text('Adjust Settings'),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A3(
+								_user$project$Main$pButtonHover,
+								_elm_lang$html$Html$button,
+								{
+									ctor: '::',
+									_0: _user$project$Main$pButtonStyle,
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Events$onClick(
+											_user$project$Main$UpdateGame(_user$project$Main$Pre)),
+										_1: {ctor: '[]'}
+									}
+								},
+								{
+									ctor: '::',
+									_0: _elm_lang$svg$Svg$text('Exit'),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A3(
+									_user$project$Main$pButtonHover,
+									_elm_lang$html$Html$button,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$style(
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												_user$project$Main$pButtonStyleList,
+												{
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'visibility', _1: 'hidden'},
+													_1: {ctor: '[]'}
+												})),
+										_1: {ctor: '[]'}
+									},
+									{
+										ctor: '::',
+										_0: _elm_lang$svg$Svg$text('Exit'),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}),
+			_1: {ctor: '[]'}
+		});
+};
+var _user$project$Main$gameView = function (model) {
+	var pause = _user$project$Main$pauseView(model);
+	var _p21 = A2(
+		_user$project$Main$genVBox,
+		_user$project$Main$mr(model.size),
+		{ctor: '_Tuple2', _0: model.x, _1: model.y});
+	var vx1 = _p21._0;
+	var vy1 = _p21._1;
+	var vw = _p21._2;
+	var vh = _p21._3;
+	var gridlines = _user$project$Main$drawLines;
+	var vBox = A2(
+		_user$project$Main$genViewBox,
+		_user$project$Main$mr(model.size),
+		{ctor: '_Tuple2', _0: model.x, _1: model.y});
+	var pImage = function () {
+		var _p22 = model.display;
+		if (_p22.ctor === 'LS') {
+			return A2(
+				_elm_lang$svg$Svg$image,
+				{ctor: '[]'},
+				{ctor: '[]'});
+		} else {
+			return A2(
+				_elm_lang$svg$Svg$image,
+				{
+					ctor: '::',
+					_0: _elm_lang$svg$Svg_Attributes$x('0%'),
+					_1: {
+						ctor: '::',
+						_0: _elm_lang$svg$Svg_Attributes$y('0%'),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$svg$Svg_Attributes$height('5000'),
+							_1: {
+								ctor: '::',
+								_0: _elm_lang$svg$Svg_Attributes$width('5000'),
+								_1: {
+									ctor: '::',
+									_0: _elm_lang$svg$Svg_Attributes$xlinkHref(_p22._0.source),
+									_1: {ctor: '[]'}
+								}
+							}
+						}
+					}
+				},
+				{ctor: '[]'});
+		}
+	}();
+	var pfill = function () {
+		var _p23 = model.display;
+		if (_p23.ctor === 'LS') {
+			return _p23._0;
+		} else {
+			return 'url(#player)';
+		}
+	}();
+	var feeds = _user$project$Main$buildFeeds(model.feed);
+	var posY = _elm_lang$core$Basics$toString(model.y);
+	var posX = _elm_lang$core$Basics$toString(model.x);
+	return A2(
+		_elm_lang$html$Html$div,
+		{ctor: '[]'},
+		{
+			ctor: '::',
+			_0: A2(
+				_elm_lang$html$Html$div,
+				{
+					ctor: '::',
+					_0: _elm_lang$html$Html_Attributes$style(
+						{
+							ctor: '::',
+							_0: {ctor: '_Tuple2', _0: 'margin', _1: '0'},
+							_1: {
+								ctor: '::',
+								_0: {ctor: '_Tuple2', _0: 'padding', _1: '0'},
+								_1: {
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'overflow', _1: 'hidden'},
+									_1: {ctor: '[]'}
+								}
+							}
+						}),
+					_1: {ctor: '[]'}
+				},
+				{
+					ctor: '::',
+					_0: A2(
+						_elm_lang$svg$Svg$svg,
+						{
+							ctor: '::',
+							_0: _elm_lang$html$Html_Attributes$style(
+								{
+									ctor: '::',
+									_0: {ctor: '_Tuple2', _0: 'position', _1: 'fixed'},
+									_1: {
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'top', _1: '0'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'left', _1: '0'},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'height', _1: '100%'},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'width', _1: '100%'},
+													_1: {ctor: '[]'}
+												}
+											}
+										}
+									}
+								}),
+							_1: {
+								ctor: '::',
+								_0: vBox,
+								_1: {ctor: '[]'}
+							}
+						},
+						A2(
+							_elm_lang$core$Basics_ops['++'],
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$svg$Svg$defs,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$svg$Svg$pattern,
+											{
+												ctor: '::',
+												_0: _elm_lang$svg$Svg_Attributes$id('player'),
+												_1: {
+													ctor: '::',
+													_0: _elm_lang$svg$Svg_Attributes$x('0%'),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$svg$Svg_Attributes$y('0%'),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$svg$Svg_Attributes$height('100%'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$svg$Svg_Attributes$width('100%'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$svg$Svg_Attributes$viewBox('0 0 5000 5000'),
+																	_1: {ctor: '[]'}
+																}
+															}
+														}
+													}
+												}
+											},
+											{
+												ctor: '::',
+												_0: pImage,
+												_1: {ctor: '[]'}
+											}),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							},
+							A2(
+								_elm_lang$core$Basics_ops['++'],
+								gridlines,
+								A2(
+									_elm_lang$core$Basics_ops['++'],
+									feeds(1),
+									A2(
+										_elm_lang$core$Basics_ops['++'],
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$svg$Svg$circle,
+												{
+													ctor: '::',
+													_0: _elm_lang$svg$Svg_Attributes$cx(posX),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$svg$Svg_Attributes$cy(posY),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$svg$Svg_Attributes$r(
+																_elm_lang$core$Basics$toString(
+																	_user$project$Main$mr(model.size))),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$svg$Svg_Attributes$fill(pfill),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$svg$Svg_Attributes$stroke('black'),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1px'),
+																		_1: {ctor: '[]'}
+																	}
+																}
+															}
+														}
+													}
+												},
+												{ctor: '[]'}),
+											_1: {ctor: '[]'}
+										},
+										{
+											ctor: '::',
+											_0: A2(
+												_elm_lang$svg$Svg$text_,
+												{
+													ctor: '::',
+													_0: _elm_lang$svg$Svg_Attributes$x(posX),
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$svg$Svg_Attributes$y(posY),
+														_1: {
+															ctor: '::',
+															_0: _elm_lang$svg$Svg_Attributes$textAnchor('middle'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$svg$Svg_Attributes$alignmentBaseline('middle'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$html$Html_Attributes$style(
+																		{
+																			ctor: '::',
+																			_0: {
+																				ctor: '_Tuple2',
+																				_0: 'font-size',
+																				_1: A2(
+																					_elm_lang$core$Basics_ops['++'],
+																					_elm_lang$core$Basics$toString(
+																						_user$project$Main$mr(model.size) / 2),
+																					'px')
+																			},
+																			_1: {
+																				ctor: '::',
+																				_0: {ctor: '_Tuple2', _0: 'font-weight', _1: 'bold'},
+																				_1: {
+																					ctor: '::',
+																					_0: {ctor: '_Tuple2', _0: 'fill', _1: 'white'},
+																					_1: {
+																						ctor: '::',
+																						_0: {ctor: '_Tuple2', _0: 'fill-opacity', _1: '1'},
+																						_1: {
+																							ctor: '::',
+																							_0: {ctor: '_Tuple2', _0: 'stroke', _1: '#000'},
+																							_1: {
+																								ctor: '::',
+																								_0: {
+																									ctor: '_Tuple2',
+																									_0: 'stroke-width',
+																									_1: A2(
+																										_elm_lang$core$Basics_ops['++'],
+																										_elm_lang$core$Basics$toString(
+																											_user$project$Main$mr(model.size) / 50),
+																										'px')
+																								},
+																								_1: {
+																									ctor: '::',
+																									_0: {ctor: '_Tuple2', _0: 'stroke-linecap', _1: 'butt'},
+																									_1: {
+																										ctor: '::',
+																										_0: {ctor: '_Tuple2', _0: 'stroke-linejoin', _1: 'miter'},
+																										_1: {
+																											ctor: '::',
+																											_0: {ctor: '_Tuple2', _0: 'stroke-opacity', _1: '1'},
+																											_1: {
+																												ctor: '::',
+																												_0: {ctor: '_Tuple2', _0: 'font-family', _1: 'Sans-Serif'},
+																												_1: {ctor: '[]'}
+																											}
+																										}
+																									}
+																								}
+																							}
+																						}
+																					}
+																				}
+																			}
+																		}),
+																	_1: {ctor: '[]'}
+																}
+															}
+														}
+													}
+												},
+												{
+													ctor: '::',
+													_0: _elm_lang$svg$Svg$text(model.name),
+													_1: {ctor: '[]'}
+												}),
+											_1: {ctor: '[]'}
+										}))))),
+					_1: {
+						ctor: '::',
+						_0: A2(
+							_elm_lang$html$Html$div,
+							{
+								ctor: '::',
+								_0: _elm_lang$html$Html_Attributes$style(
+									{
+										ctor: '::',
+										_0: {ctor: '_Tuple2', _0: 'position', _1: 'fixed'},
+										_1: {
+											ctor: '::',
+											_0: {ctor: '_Tuple2', _0: 'bottom', _1: '1%'},
+											_1: {
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'left', _1: '1%'},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'color', _1: 'white'},
+													_1: {
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'darkgrey'},
+														_1: {
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: 'opacity', _1: '0.7'},
+															_1: {ctor: '[]'}
+														}
+													}
+												}
+											}
+										}
+									}),
+								_1: {ctor: '[]'}
+							},
+							{
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$strong,
+									{ctor: '[]'},
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html$text(
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												'Score: ',
+												_elm_lang$core$Basics$toString(
+													_elm_lang$core$Basics$round(model.size - 25)))),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}),
+						_1: {
+							ctor: '::',
+							_0: A2(
+								_elm_lang$html$Html$div,
+								{
+									ctor: '::',
+									_0: _elm_lang$html$Html_Attributes$hidden(!model.fps),
+									_1: {
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$style(
+											{
+												ctor: '::',
+												_0: {ctor: '_Tuple2', _0: 'position', _1: 'fixed'},
+												_1: {
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'top', _1: '1%'},
+													_1: {
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: 'left', _1: '1%'},
+														_1: {
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: 'color', _1: 'white'},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'darkgrey'},
+																_1: {
+																	ctor: '::',
+																	_0: {ctor: '_Tuple2', _0: 'opacity', _1: '0.7'},
+																	_1: {ctor: '[]'}
+																}
+															}
+														}
+													}
+												}
+											}),
+										_1: {ctor: '[]'}
+									}
+								},
+								{
+									ctor: '::',
+									_0: A2(
+										_elm_lang$html$Html$strong,
+										{ctor: '[]'},
+										{
+											ctor: '::',
+											_0: _elm_lang$html$Html$text(
+												A2(
+													_elm_lang$core$Basics_ops['++'],
+													'FPS: ',
+													_elm_lang$core$Basics$toString(
+														_elm_lang$core$Basics$round(model.tickRate)))),
+											_1: {ctor: '[]'}
+										}),
+									_1: {ctor: '[]'}
+								}),
+							_1: {
+								ctor: '::',
+								_0: A2(
+									_elm_lang$html$Html$div,
+									{
+										ctor: '::',
+										_0: _elm_lang$html$Html_Attributes$hidden(!model.minimap),
+										_1: {
+											ctor: '::',
+											_0: _elm_lang$html$Html_Attributes$style(
+												{
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'position', _1: 'fixed'},
+													_1: {
+														ctor: '::',
+														_0: {ctor: '_Tuple2', _0: 'bottom', _1: '1%'},
+														_1: {
+															ctor: '::',
+															_0: {ctor: '_Tuple2', _0: 'right', _1: '1%'},
+															_1: {
+																ctor: '::',
+																_0: {ctor: '_Tuple2', _0: 'height', _1: '10%'},
+																_1: {
+																	ctor: '::',
+																	_0: {ctor: '_Tuple2', _0: 'width', _1: '10%'},
+																	_1: {ctor: '[]'}
+																}
+															}
+														}
+													}
+												}),
+											_1: {ctor: '[]'}
+										}
+									},
+									{
+										ctor: '::',
+										_0: A2(
+											_elm_lang$svg$Svg$svg,
+											{
+												ctor: '::',
+												_0: _elm_lang$svg$Svg_Attributes$viewBox(
+													A2(
+														_elm_lang$core$Basics_ops['++'],
+														'0 0 ',
+														A2(
+															_elm_lang$core$Basics_ops['++'],
+															_elm_lang$core$Basics$toString(_user$project$Main$svWidth),
+															A2(
+																_elm_lang$core$Basics_ops['++'],
+																' ',
+																_elm_lang$core$Basics$toString(_user$project$Main$svHeight))))),
+												_1: {ctor: '[]'}
+											},
+											A2(
+												_elm_lang$core$Basics_ops['++'],
+												{
+													ctor: '::',
+													_0: A2(
+														_elm_lang$svg$Svg$rect,
+														{
+															ctor: '::',
+															_0: _elm_lang$svg$Svg_Attributes$x('0'),
+															_1: {
+																ctor: '::',
+																_0: _elm_lang$svg$Svg_Attributes$y('0'),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$svg$Svg_Attributes$height(
+																		_elm_lang$core$Basics$toString(_user$project$Main$svHeight)),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$svg$Svg_Attributes$width(
+																			_elm_lang$core$Basics$toString(_user$project$Main$svWidth)),
+																		_1: {
+																			ctor: '::',
+																			_0: _elm_lang$svg$Svg_Attributes$fill('white'),
+																			_1: {
+																				ctor: '::',
+																				_0: _elm_lang$svg$Svg_Attributes$strokeWidth('1%'),
+																				_1: {
+																					ctor: '::',
+																					_0: _elm_lang$svg$Svg_Attributes$stroke('black'),
+																					_1: {ctor: '[]'}
+																				}
+																			}
+																		}
+																	}
+																}
+															}
+														},
+														{ctor: '[]'}),
+													_1: {
+														ctor: '::',
+														_0: A2(
+															_elm_lang$svg$Svg$rect,
+															{
+																ctor: '::',
+																_0: _elm_lang$svg$Svg_Attributes$x(vx1),
+																_1: {
+																	ctor: '::',
+																	_0: _elm_lang$svg$Svg_Attributes$y(vy1),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$svg$Svg_Attributes$width(vw),
+																		_1: {
+																			ctor: '::',
+																			_0: _elm_lang$svg$Svg_Attributes$height(vh),
+																			_1: {
+																				ctor: '::',
+																				_0: _elm_lang$svg$Svg_Attributes$fill(pfill),
+																				_1: {ctor: '[]'}
+																			}
+																		}
+																	}
+																}
+															},
+															{ctor: '[]'}),
+														_1: {ctor: '[]'}
+													}
+												},
+												feeds(5))),
+										_1: {ctor: '[]'}
+									}),
+								_1: {ctor: '[]'}
+							}
+						}
+					}
+				}),
+			_1: {
+				ctor: '::',
+				_0: _elm_lang$core$Native_Utils.eq(model.inGame, _user$project$Main$Pause) ? pause : A2(
+					_elm_lang$html$Html$div,
+					{ctor: '[]'},
+					{ctor: '[]'}),
+				_1: {ctor: '[]'}
+			}
+		});
+};
 var _user$project$Main$NameUpdate = function (a) {
 	return {ctor: 'NameUpdate', _0: a};
 };
@@ -11373,17 +11815,17 @@ var _user$project$Main$radioButton = F3(
 	});
 var _user$project$Main$preView = function (model) {
 	var img = function () {
-		var _p23 = model.display;
-		if (_p23.ctor === 'LS') {
+		var _p24 = model.display;
+		if (_p24.ctor === 'LS') {
 			return '';
 		} else {
-			return _p23._0.source;
+			return _p24._0.source;
 		}
 	}();
 	var current = function () {
-		var _p24 = model.display;
-		if (_p24.ctor === 'LS') {
-			return _p24._0;
+		var _p25 = model.display;
+		if (_p25.ctor === 'LS') {
+			return _p25._0;
 		} else {
 			return '';
 		}
@@ -11437,20 +11879,24 @@ var _user$project$Main$preView = function (model) {
 							_elm_lang$html$Html$input,
 							{
 								ctor: '::',
-								_0: _elm_lang$html$Html_Attributes$placeholder('name'),
+								_0: _user$project$Main$textStyle,
 								_1: {
 									ctor: '::',
-									_0: _elm_lang$html$Html_Events$onInput(
-										function (inp) {
-											return _user$project$Main$NameUpdate(inp);
-										}),
+									_0: _elm_lang$html$Html_Attributes$placeholder('name'),
 									_1: {
 										ctor: '::',
-										_0: _user$project$Main$radioStyle,
+										_0: _elm_lang$html$Html_Events$onInput(
+											function (inp) {
+												return _user$project$Main$NameUpdate(inp);
+											}),
 										_1: {
 											ctor: '::',
-											_0: _elm_lang$html$Html_Attributes$value(model.name),
-											_1: {ctor: '[]'}
+											_0: _user$project$Main$radioStyle,
+											_1: {
+												ctor: '::',
+												_0: _elm_lang$html$Html_Attributes$value(model.name),
+												_1: {ctor: '[]'}
+											}
 										}
 									}
 								}
@@ -11479,21 +11925,25 @@ var _user$project$Main$preView = function (model) {
 									_elm_lang$html$Html$input,
 									{
 										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$placeholder('Input Image URL'),
+										_0: _user$project$Main$textStyle,
 										_1: {
 											ctor: '::',
-											_0: _elm_lang$html$Html_Events$onInput(
-												function (inp) {
-													return _user$project$Main$DispUpdate(
-														_user$project$Main$RS(inp));
-												}),
+											_0: _elm_lang$html$Html_Attributes$placeholder('Input Image URL'),
 											_1: {
 												ctor: '::',
-												_0: _user$project$Main$radioStyle,
+												_0: _elm_lang$html$Html_Events$onInput(
+													function (inp) {
+														return _user$project$Main$DispUpdate(
+															_user$project$Main$RS(inp));
+													}),
 												_1: {
 													ctor: '::',
-													_0: _elm_lang$html$Html_Attributes$value(img),
-													_1: {ctor: '[]'}
+													_0: _user$project$Main$radioStyle,
+													_1: {
+														ctor: '::',
+														_0: _elm_lang$html$Html_Attributes$value(img),
+														_1: {ctor: '[]'}
+													}
 												}
 											}
 										}
@@ -11538,18 +11988,27 @@ var _user$project$Main$preView = function (model) {
 														_elm_lang$html$Html$input,
 														{
 															ctor: '::',
-															_0: _elm_lang$html$Html_Attributes$type_('color'),
+															_0: _elm_lang$html$Html_Attributes$style(
+																{
+																	ctor: '::',
+																	_0: {ctor: '_Tuple2', _0: 'border-radius', _1: '5px'},
+																	_1: {ctor: '[]'}
+																}),
 															_1: {
 																ctor: '::',
-																_0: _elm_lang$html$Html_Attributes$value(current),
+																_0: _elm_lang$html$Html_Attributes$type_('color'),
 																_1: {
 																	ctor: '::',
-																	_0: _elm_lang$html$Html_Events$onInput(
-																		function (inp) {
-																			return _user$project$Main$DispUpdate(
-																				_user$project$Main$LS(inp));
-																		}),
-																	_1: {ctor: '[]'}
+																	_0: _elm_lang$html$Html_Attributes$value(current),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$html$Html_Events$onInput(
+																			function (inp) {
+																				return _user$project$Main$DispUpdate(
+																					_user$project$Main$LS(inp));
+																			}),
+																		_1: {ctor: '[]'}
+																	}
 																}
 															}
 														},
@@ -11566,29 +12025,57 @@ var _user$project$Main$preView = function (model) {
 										{ctor: '[]'},
 										{
 											ctor: '::',
-											_0: A2(
+											_0: A4(
+												_jinjor$elm_inline_hover$InlineHover$hover,
+												{
+													ctor: '::',
+													_0: {ctor: '_Tuple2', _0: 'background-color', _1: '#3a963a'},
+													_1: {ctor: '[]'}
+												},
 												_elm_lang$html$Html$button,
 												{
 													ctor: '::',
 													_0: _elm_lang$html$Html_Attributes$style(
 														{
 															ctor: '::',
-															_0: {ctor: '_Tuple2', _0: 'background-color', _1: 'green'},
+															_0: {ctor: '_Tuple2', _0: 'margin', _1: '0.3em'},
 															_1: {
 																ctor: '::',
-																_0: {ctor: '_Tuple2', _0: 'color', _1: 'white'},
-																_1: {ctor: '[]'}
+																_0: {ctor: '_Tuple2', _0: 'cursor', _1: 'pointer'},
+																_1: {
+																	ctor: '::',
+																	_0: {ctor: '_Tuple2', _0: 'background-color', _1: '#5cb85c'},
+																	_1: {
+																		ctor: '::',
+																		_0: {ctor: '_Tuple2', _0: 'border-radius', _1: '4px'},
+																		_1: {
+																			ctor: '::',
+																			_0: {ctor: '_Tuple2', _0: 'border', _1: '1px solid transparent'},
+																			_1: {
+																				ctor: '::',
+																				_0: {ctor: '_Tuple2', _0: 'border-color', _1: '#4cae4c'},
+																				_1: {
+																					ctor: '::',
+																					_0: {ctor: '_Tuple2', _0: 'color', _1: 'white'},
+																					_1: {ctor: '[]'}
+																				}
+																			}
+																		}
+																	}
+																}
 															}
 														}),
 													_1: {
 														ctor: '::',
-														_0: _elm_lang$html$Html_Events$onClick(_user$project$Main$StartG),
+														_0: _elm_lang$html$Html_Events$onClick(
+															_user$project$Main$UpdateGame(_user$project$Main$Play)),
 														_1: {ctor: '[]'}
 													}
 												},
 												{
 													ctor: '::',
-													_0: _elm_lang$html$Html$text('Start'),
+													_0: _elm_lang$html$Html$text(
+														_elm_lang$core$Native_Utils.eq(model.inGame, _user$project$Main$Pre) ? 'Start' : 'Resume'),
 													_1: {ctor: '[]'}
 												}),
 											_1: {ctor: '[]'}
@@ -11615,7 +12102,7 @@ var _user$project$Main$preView = function (model) {
 														{ctor: '[]'},
 														{
 															ctor: '::',
-															_0: _elm_lang$html$Html$text('Use the mouse move the circle around, press ESC to quit the game at any time'),
+															_0: _elm_lang$html$Html$text('Use the mouse move the circle around, press ESC or \"p\" to bring up the pause menu'),
 															_1: {ctor: '[]'}
 														}),
 													_1: {
@@ -11712,11 +12199,16 @@ var _user$project$Main$preView = function (model) {
 		});
 };
 var _user$project$Main$view = function (model) {
-	var _p25 = model.inGame;
-	if (_p25 === true) {
-		return _user$project$Main$gameView(model);
-	} else {
-		return _user$project$Main$preView(model);
+	var _p26 = model.inGame;
+	switch (_p26.ctor) {
+		case 'Play':
+			return _user$project$Main$gameView(model);
+		case 'Pause':
+			return _user$project$Main$gameView(model);
+		case 'Pre':
+			return _user$project$Main$preView(model);
+		default:
+			return _user$project$Main$preView(model);
 	}
 };
 var _user$project$Main$RandResult = function (a) {
@@ -11735,13 +12227,13 @@ var _user$project$Main$update = F2(
 	function (msg, model) {
 		var rng = model.rng;
 		var rand = _user$project$Main$genRand(rng);
-		var _p26 = msg;
-		switch (_p26.ctor) {
+		var _p27 = msg;
+		switch (_p27.ctor) {
 			case 'KeyMsg':
-				var _p29 = _p26._0;
-				if (_elm_lang$core$Native_Utils.eq(model.control, _user$project$Main$Keys)) {
-					var _p27 = _p29;
-					switch (_p27) {
+				var _p31 = _p27._0;
+				if (_elm_lang$core$Native_Utils.eq(model.control, _user$project$Main$Keys) && _elm_lang$core$Native_Utils.eq(model.inGame, _user$project$Main$Play)) {
+					var _p28 = _p31;
+					switch (_p28) {
 						case 87:
 							return {
 								ctor: '_Tuple2',
@@ -11831,41 +12323,53 @@ var _user$project$Main$update = F2(
 								_1: rand
 							};
 						case 27:
-							return {
-								ctor: '_Tuple2',
-								_0: _user$project$Main$resetGame(model),
-								_1: _elm_lang$core$Platform_Cmd$none
-							};
+							return _user$project$Main$escKey(model);
+						case 80:
+							return _user$project$Main$escKey(model);
 						default:
 							return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 					}
 				} else {
-					var _p28 = _p29;
-					if (_p28 === 27) {
-						return {
-							ctor: '_Tuple2',
-							_0: _user$project$Main$resetGame(model),
-							_1: _elm_lang$core$Platform_Cmd$none
-						};
+					if (_elm_lang$core$Native_Utils.eq(model.inGame, _user$project$Main$Play)) {
+						var _p29 = _p31;
+						switch (_p29) {
+							case 27:
+								return _user$project$Main$escKey(model);
+							case 80:
+								return _user$project$Main$escKey(model);
+							default:
+								return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+						}
 					} else {
-						return {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+						var _p30 = _p31;
+						switch (_p30) {
+							case 27:
+								return _user$project$Main$escKey(model);
+							case 80:
+								return _user$project$Main$escKey(model);
+							default:
+								return A2(
+									_elm_lang$core$Platform_Cmd_ops['!'],
+									model,
+									{ctor: '[]'});
+						}
 					}
 				}
 			case 'Tick':
-				var _p31 = _p26._0;
+				var _p33 = _p27._0;
 				if (_elm_lang$core$Native_Utils.eq(model.control, _user$project$Main$Mouse)) {
-					var _p30 = A3(
+					var _p32 = A3(
 						_user$project$Main$mouseSpeed,
 						_user$project$Main$scCenter(model),
 						{ctor: '_Tuple2', _0: model.mx, _1: model.my},
 						2);
-					var dx = _p30._0;
-					var dy = _p30._1;
+					var dx = _p32._0;
+					var dy = _p32._1;
 					return {
 						ctor: '_Tuple2',
 						_0: A2(
 							_user$project$Main$tick,
-							_p31,
+							_p33,
 							_user$project$Main$testConsume(
 								_elm_lang$core$Native_Utils.update(
 									model,
@@ -11878,17 +12382,17 @@ var _user$project$Main$update = F2(
 				} else {
 					return {
 						ctor: '_Tuple2',
-						_0: A2(_user$project$Main$tick, _p31, model),
+						_0: A2(_user$project$Main$tick, _p33, model),
 						_1: _elm_lang$core$Platform_Cmd$none
 					};
 				}
 			case 'MouseMsg':
-				var _p32 = _p26._0;
+				var _p34 = _p27._0;
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
-						{mx: _p32.x, my: _p32.y}),
+						{mx: _p34.x, my: _p34.y}),
 					{ctor: '[]'});
 			case 'DispUpdate':
 				return {
@@ -11896,7 +12400,7 @@ var _user$project$Main$update = F2(
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
 						{
-							display: _user$project$Main$updatePlayerDisplay(_p26._0)
+							display: _user$project$Main$updatePlayerDisplay(_p27._0)
 						}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
@@ -11905,20 +12409,24 @@ var _user$project$Main$update = F2(
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{name: _p26._0}),
+						{name: _p27._0}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			case 'StartG':
+			case 'UpdateGame':
+				var _p35 = _p27._0;
 				return {
 					ctor: '_Tuple2',
-					_0: _elm_lang$core$Native_Utils.update(
+					_0: _elm_lang$core$Native_Utils.eq(_p35, _user$project$Main$Pre) ? _user$project$Main$resetGame(
+						_elm_lang$core$Native_Utils.update(
+							model,
+							{inGame: _p35})) : _elm_lang$core$Native_Utils.update(
 						model,
-						{inGame: true}),
+						{inGame: _p35}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			case 'Toggle':
-				var _p33 = _p26._0;
-				switch (_p33) {
+				var _p36 = _p27._0;
+				switch (_p36) {
 					case 'FPS':
 						return A2(
 							_elm_lang$core$Platform_Cmd_ops['!'],
@@ -11940,12 +12448,12 @@ var _user$project$Main$update = F2(
 							{ctor: '[]'});
 				}
 			case 'UpdateWinSize':
-				var _p34 = _p26._0;
+				var _p37 = _p27._0;
 				return {
 					ctor: '_Tuple2',
 					_0: _elm_lang$core$Native_Utils.update(
 						model,
-						{winH: _p34.height, winW: _p34.width}),
+						{winH: _p37.height, winW: _p37.width}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
 			default:
@@ -11953,7 +12461,7 @@ var _user$project$Main$update = F2(
 					_elm_lang$core$List$length(model.feed),
 					rng.limit) < 0) ? {
 					ctor: '_Tuple2',
-					_0: A4(_user$project$Main$genFeed, rng, _p26._0._0, _p26._0._1, model),
+					_0: A4(_user$project$Main$genFeed, rng, _p27._0._0, _p27._0._1, model),
 					_1: _elm_lang$core$Platform_Cmd$none
 				} : {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 		}
@@ -11972,11 +12480,24 @@ var _user$project$Main$subscriptions = function (model) {
 		_0: _elm_lang$mouse$Mouse$moves(_user$project$Main$MouseMsg),
 		_1: {ctor: '[]'}
 	} : {ctor: '[]'};
-	var _p35 = model.inGame;
-	if (_p35 === true) {
-		return _elm_lang$core$Platform_Sub$batch(
-			A2(
-				_elm_lang$core$Basics_ops['++'],
+	var _p38 = model.inGame;
+	switch (_p38.ctor) {
+		case 'Play':
+			return _elm_lang$core$Platform_Sub$batch(
+				A2(
+					_elm_lang$core$Basics_ops['++'],
+					{
+						ctor: '::',
+						_0: _elm_lang$keyboard$Keyboard$downs(_user$project$Main$KeyMsg),
+						_1: {
+							ctor: '::',
+							_0: _elm_lang$window$Window$resizes(_user$project$Main$UpdateWinSize),
+							_1: {ctor: '[]'}
+						}
+					},
+					A2(_elm_lang$core$Basics_ops['++'], ani, mice)));
+		case 'Pause':
+			return _elm_lang$core$Platform_Sub$batch(
 				{
 					ctor: '::',
 					_0: _elm_lang$keyboard$Keyboard$downs(_user$project$Main$KeyMsg),
@@ -11985,10 +12506,11 @@ var _user$project$Main$subscriptions = function (model) {
 						_0: _elm_lang$window$Window$resizes(_user$project$Main$UpdateWinSize),
 						_1: {ctor: '[]'}
 					}
-				},
-				A2(_elm_lang$core$Basics_ops['++'], ani, mice)));
-	} else {
-		return _elm_lang$core$Platform_Sub$none;
+				});
+		case 'Pre':
+			return _elm_lang$core$Platform_Sub$none;
+		default:
+			return _elm_lang$core$Platform_Sub$none;
 	}
 };
 var _user$project$Main$main = _elm_lang$html$Html$program(
