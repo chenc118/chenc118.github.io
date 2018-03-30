@@ -449,18 +449,18 @@ pButtonStyleList = [("display","block")
                                 ,("margin","auto")
                                 ,("background","none")
                                 ,("border","none")
-                                ,("font-size","3em")
+                                ,("font-size","50px")
                                 ,("color","#FFF")
                                 ,("opacity","1")
                                 ,("vertical-align","middle")
                                 --black color stroke from https://stackoverflow.com/questions/4919076/outline-effect-to-text?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
                                 ,("text-shadow","-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000")
-                                ,("padding-top","0.15em")--stuff so that slight grow doesn't alter position
-                                ,("padding-bottom","0.15em")]
-pButtonHover = InlineHover.hover[("font-size","3.1em")
+                                ,("padding-top","1px")--stuff so that slight grow doesn't alter position
+                                ,("padding-bottom","1px")]
+pButtonHover = InlineHover.hover[("font-size","52px")
                                 ,("color","#ffdf00")--stole the hover sort of style from terraria
-                                ,("padding-top","0.1153em")--computed to 4 decimal places such that overall height doesn't change. (Quit for some reasons causes a shift)
-                                ,("padding-bottom","0.1153em")]
+                                ,("padding-top","0px")
+                                ,("padding-bottom","0px")]
 -- overlay for the pause menu
 --pauseView : Model -> Html Msg
 --align pausemenu in center https://stackoverflow.com/questions/356809/best-way-to-center-a-div-on-a-page-vertically-and-horizontally/18618259#18618259
@@ -478,8 +478,6 @@ pauseView model = div [Html.Attributes.style[("display","flex")
                     pButtonHover Html.button[pButtonStyle, Html.Events.onClick (UpdateGame Play)][ Svg.text "Resume"]
                     ,pButtonHover Html.button[pButtonStyle, Html.Events.onClick (UpdateGame Adjust)][ Svg.text "Adjust Settings"]
                     ,pButtonHover Html.button[pButtonStyle, Html.Events.onClick (UpdateGame Pre)][Svg.text "Exit"]
-                    --this is literally here to prevent a slight bumping up of the middle element on hovering over the last, nothing else
-                    ,pButtonHover Html.button[Html.Attributes.style (pButtonStyleList ++ [("visibility","hidden")])][Svg.text "Exit"]
                         ]
                     ]
                     

@@ -10374,16 +10374,16 @@ var _jinjor$elm_inline_hover$InlineHover$hover = F4(
 var _user$project$Main$pButtonHover = _jinjor$elm_inline_hover$InlineHover$hover(
 	{
 		ctor: '::',
-		_0: {ctor: '_Tuple2', _0: 'font-size', _1: '3.1em'},
+		_0: {ctor: '_Tuple2', _0: 'font-size', _1: '52px'},
 		_1: {
 			ctor: '::',
 			_0: {ctor: '_Tuple2', _0: 'color', _1: '#ffdf00'},
 			_1: {
 				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: 'padding-top', _1: '0.1153em'},
+				_0: {ctor: '_Tuple2', _0: 'padding-top', _1: '0px'},
 				_1: {
 					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'padding-bottom', _1: '0.1153em'},
+					_0: {ctor: '_Tuple2', _0: 'padding-bottom', _1: '0px'},
 					_1: {ctor: '[]'}
 				}
 			}
@@ -10403,7 +10403,7 @@ var _user$project$Main$pButtonStyleList = {
 				_0: {ctor: '_Tuple2', _0: 'border', _1: 'none'},
 				_1: {
 					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'font-size', _1: '3em'},
+					_0: {ctor: '_Tuple2', _0: 'font-size', _1: '50px'},
 					_1: {
 						ctor: '::',
 						_0: {ctor: '_Tuple2', _0: 'color', _1: '#FFF'},
@@ -10418,10 +10418,10 @@ var _user$project$Main$pButtonStyleList = {
 									_0: {ctor: '_Tuple2', _0: 'text-shadow', _1: '-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,1px 1px 0 #000'},
 									_1: {
 										ctor: '::',
-										_0: {ctor: '_Tuple2', _0: 'padding-top', _1: '0.15em'},
+										_0: {ctor: '_Tuple2', _0: 'padding-top', _1: '1px'},
 										_1: {
 											ctor: '::',
-											_0: {ctor: '_Tuple2', _0: 'padding-bottom', _1: '0.15em'},
+											_0: {ctor: '_Tuple2', _0: 'padding-bottom', _1: '1px'},
 											_1: {ctor: '[]'}
 										}
 									}
@@ -11196,31 +11196,7 @@ var _user$project$Main$pauseView = function (model) {
 									_0: _elm_lang$svg$Svg$text('Exit'),
 									_1: {ctor: '[]'}
 								}),
-							_1: {
-								ctor: '::',
-								_0: A3(
-									_user$project$Main$pButtonHover,
-									_elm_lang$html$Html$button,
-									{
-										ctor: '::',
-										_0: _elm_lang$html$Html_Attributes$style(
-											A2(
-												_elm_lang$core$Basics_ops['++'],
-												_user$project$Main$pButtonStyleList,
-												{
-													ctor: '::',
-													_0: {ctor: '_Tuple2', _0: 'visibility', _1: 'hidden'},
-													_1: {ctor: '[]'}
-												})),
-										_1: {ctor: '[]'}
-									},
-									{
-										ctor: '::',
-										_0: _elm_lang$svg$Svg$text('Exit'),
-										_1: {ctor: '[]'}
-									}),
-								_1: {ctor: '[]'}
-							}
+							_1: {ctor: '[]'}
 						}
 					}
 				}),
