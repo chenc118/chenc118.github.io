@@ -47,6 +47,7 @@ type alias Model = {x:Float, y:Float,
                     rng:RNG,
                     fps:Bool,
                     minimap:Bool,
+                    velocity:Float,--aka how fast dot moves
                     tickFrames:{first:Float,count:Int},--stuff to get the FPS aka ticks/second
                     tickRate:Float,
                     inGame:GameState} -- list of records representing the different dots etc
@@ -61,6 +62,7 @@ type Msg = KeyMsg Key.KeyCode
             | Tick Float
             | MouseMsg Mouse.Position
             | Toggle String
+            | ChangeControl Control
 
 
 init : (Model, Cmd.Cmd Msg)
@@ -76,6 +78,7 @@ init = ({x=(toFloat svWidth)/2,
         rng = {range = 50, regChance=1, superChance=0,limit=100},
         fps = True,
         minimap = True,
+        velocity = 2,
         tickFrames={first=0,count=0},-- debug for animation tickRate
         tickRate=0,
         inGame=Pre
@@ -213,12 +216,12 @@ testConsume model = let
         feeds = model.feed
         consumed = List.map (canConsume (mr model.size) model.x model.y) feeds -- messy mapping stuff to produce a boolean list
         both = wrap consumed feeds --wrap the two together lazily in a tuple
-    in {model | feed = List.reverse <|filterOut both [], size = shrink <|consume both model.size}--update model
+    in {model | feed = List.reverse <|filterOut both [], size = shrink model.velocity <|consume both model.size}--update model
 
-shrink:Float -> Float
+shrink:Float -> Float -> Float
 --shrink size = size - (sqrt ((size-25) /10000000) ) -- basically shrink faster if larger, though at a slower rate, pretty much grow forever like this
 --shrink size = size - (((size*size)-625) / 10000000) --shrink really fast when big, constant gen max ~ 2236 (can get higher if you game it), rng god gen max about 70711
-shrink size = size - (((size*size)-625) / 50000000) --shrink really fast when big, constant gen max ~ 2236 (can get higher if you game it), rng god gen max about 70711
+shrink velocity size = size - ((((size*size)-625)*velocity) / 100000000 ) --shrink really fast when big, constant gen max ~ 2236 (can get higher if you game it), rng god gen max about 70711
 
 --lazy wrapping cause seriously no way to do this kind of thing without going into a bunch of messy case x of and Maybes
 --Also the two lists should be the same size in the usage scenario
@@ -305,15 +308,15 @@ update msg model = let
         in case msg of --wasd
             --super lazy probably will be broken state change
             (KeyMsg k) -> if model.control==Keys && model.inGame==Play then case k of 
-                                87 -> (testConsume {model|y = bChecky (model.y-incNum) model.size},rand)
-                                65 -> (testConsume {model|x = bCheckx (model.x-incNum) model.size},rand)
-                                83 -> (testConsume {model|y = bChecky (model.y+incNum) model.size},rand)
-                                68 -> (testConsume {model|x = bCheckx (model.x+incNum) model.size},rand)
+                                87 -> (testConsume {model|y = bChecky (model.y-model.velocity) model.size},rand)
+                                65 -> (testConsume {model|x = bCheckx (model.x-model.velocity) model.size},rand)
+                                83 -> (testConsume {model|y = bChecky (model.y+model.velocity) model.size},rand)
+                                68 -> (testConsume {model|x = bCheckx (model.x+model.velocity) model.size},rand)
                                 --arrow keys
-                                38 -> (testConsume {model|y = bChecky (model.y-incNum) model.size},rand)
-                                37 -> (testConsume {model|x = bCheckx (model.x-incNum) model.size},rand)
-                                40 -> (testConsume {model|y = bChecky (model.y+incNum) model.size},rand)
-                                39 -> (testConsume {model|x = bCheckx (model.x+incNum) model.size},rand)
+                                38 -> (testConsume {model|y = bChecky (model.y-model.velocity) model.size},rand)
+                                37 -> (testConsume {model|x = bCheckx (model.x-model.velocity) model.size},rand)
+                                40 -> (testConsume {model|y = bChecky (model.y+model.velocity) model.size},rand)
+                                39 -> (testConsume {model|x = bCheckx (model.x+model.velocity) model.size},rand)
                                 --reset the game if escape key is pressed
                                 27 -> escKey model
                                 80 -> escKey model
@@ -327,7 +330,7 @@ update msg model = let
                                 80 -> escKey model
                                 _  -> model ! []
             (Tick t) -> if model.control==Mouse then let
-                                                    (dx,dy) = mouseSpeed (scCenter model) (model.mx,model.my) 2
+                                                    (dx,dy) = mouseSpeed (scCenter model) (model.mx,model.my) model.velocity --velocity = 2 default
                                                 in (tick t <|testConsume {model| 
                                                     x = (bCheckx (model.x+dx) model.size), 
                                                     y = (bChecky (model.y+dy) model.size)},rand)
@@ -344,6 +347,7 @@ update msg model = let
             (RandResult (a,b)) -> if (List.length model.feed < rng.limit)  --limit so there's an upper bound to the size, over 1000 it starts getting slow
                                 then (genFeed rng a b model,Cmd.none) 
                                 else (model,Cmd.none)
+            (ChangeControl c) -> {model | control=c, velocity = if c==Mouse then 2 else 10}![] --framework to adjust game speed
             --_ -> (model,Cmd.none)
 
 --genRand : RNG -> Cmd.Cmd Msg﻿
@@ -526,12 +530,28 @@ preView model =
             ]
         ,div[][
             strong[][Html.text "Instructions:"]
-            ,p[][Html.text "Use the mouse move the circle around, press ESC or \"p\" to bring up the pause menu"]
+            ,p[][Html.text ("Use"++(if model.control==Mouse then " the mouse " else " the WASD or arrow keys ")
+                    ++ "move the circle around, press ESC or \"p\" to bring up the pause menu")]
             ,p[][Html.text "The goal is eat smaller dots and grow. Try to get to 2000 points, and as a difficult challenge 2200"]
             ]
         ,div[][
             label [][input [Html.Attributes.type_ "checkbox", Html.Attributes.checked model.fps, onClick (Toggle "FPS")][], Html.text "FPS"]
             ,label [][input [Html.Attributes.type_ "checkbox", Html.Attributes.checked model.minimap, onClick (Toggle "minimap")][], Html.text "minimap"]
+            ]
+        ,div[][
+            Html.strong[][Html.text "Control:"]
+            ]
+        ,div[][
+            label [radioStyle][input [Html.Attributes.type_ "radio"
+                        ,Html.Attributes.name "control"
+                        ,Html.Events.onClick (ChangeControl Mouse)
+                        ,Html.Attributes.checked (model.control==Mouse)
+                        ][],Svg.text "Mouse"]
+            ,label [radioStyle][input [Html.Attributes.type_ "radio"
+                        ,Html.Attributes.name "control"
+                        ,Html.Events.onClick (ChangeControl Keys)
+                        ,Html.Attributes.checked (model.control==Keys)
+                        ][],Svg.text "Keyboard"]
             ]
     ]
 

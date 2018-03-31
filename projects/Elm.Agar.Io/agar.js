@@ -10600,9 +10600,10 @@ var _user$project$Main$wrap = F2(
 			return {ctor: '[]'};
 		}
 	});
-var _user$project$Main$shrink = function (size) {
-	return size - (((size * size) - 625) / 50000000);
-};
+var _user$project$Main$shrink = F2(
+	function (velocity, size) {
+		return size - ((((size * size) - 625) * velocity) / 100000000);
+	});
 var _user$project$Main$drawYLines = F5(
 	function (inc, len, ly, total, lines) {
 		drawYLines:
@@ -10780,7 +10781,9 @@ var _user$project$Main$testConsume = function (model) {
 					_user$project$Main$filterOut,
 					both,
 					{ctor: '[]'})),
-			size: _user$project$Main$shrink(
+			size: A2(
+				_user$project$Main$shrink,
+				model.velocity,
 				A2(_user$project$Main$consume, both, model.size))
 		});
 };
@@ -10951,7 +10954,9 @@ var _user$project$Main$Model = function (a) {
 														return function (o) {
 															return function (p) {
 																return function (q) {
-																	return {x: a, y: b, mx: c, my: d, winH: e, winW: f, name: g, feed: h, size: i, display: j, control: k, rng: l, fps: m, minimap: n, tickFrames: o, tickRate: p, inGame: q};
+																	return function (r) {
+																		return {x: a, y: b, mx: c, my: d, winH: e, winW: f, name: g, feed: h, size: i, display: j, control: k, rng: l, fps: m, minimap: n, velocity: o, tickFrames: p, tickRate: q, inGame: r};
+																	};
 																};
 															};
 														};
@@ -11021,6 +11026,9 @@ var _user$project$Main$escKey = function (model) {
 				{ctor: '[]'});
 	}
 };
+var _user$project$Main$ChangeControl = function (a) {
+	return {ctor: 'ChangeControl', _0: a};
+};
 var _user$project$Main$Toggle = function (a) {
 	return {ctor: 'Toggle', _0: a};
 };
@@ -11050,6 +11058,7 @@ var _user$project$Main$init = {
 		rng: {range: 50, regChance: 1, superChance: 0, limit: 100},
 		fps: true,
 		minimap: true,
+		velocity: 2,
 		tickFrames: {first: 0, count: 0},
 		tickRate: 0,
 		inGame: _user$project$Main$Pre
@@ -12074,7 +12083,14 @@ var _user$project$Main$preView = function (model) {
 														{ctor: '[]'},
 														{
 															ctor: '::',
-															_0: _elm_lang$html$Html$text('Use the mouse move the circle around, press ESC or \"p\" to bring up the pause menu'),
+															_0: _elm_lang$html$Html$text(
+																A2(
+																	_elm_lang$core$Basics_ops['++'],
+																	'Use',
+																	A2(
+																		_elm_lang$core$Basics_ops['++'],
+																		_elm_lang$core$Native_Utils.eq(model.control, _user$project$Main$Mouse) ? ' the mouse ' : ' the WASD or arrow keys ',
+																		'move the circle around, press ESC or \"p\" to bring up the pause menu'))),
 															_1: {ctor: '[]'}
 														}),
 													_1: {
@@ -12159,7 +12175,112 @@ var _user$project$Main$preView = function (model) {
 														_1: {ctor: '[]'}
 													}
 												}),
-											_1: {ctor: '[]'}
+											_1: {
+												ctor: '::',
+												_0: A2(
+													_elm_lang$html$Html$div,
+													{ctor: '[]'},
+													{
+														ctor: '::',
+														_0: A2(
+															_elm_lang$html$Html$strong,
+															{ctor: '[]'},
+															{
+																ctor: '::',
+																_0: _elm_lang$html$Html$text('Control:'),
+																_1: {ctor: '[]'}
+															}),
+														_1: {ctor: '[]'}
+													}),
+												_1: {
+													ctor: '::',
+													_0: A2(
+														_elm_lang$html$Html$div,
+														{ctor: '[]'},
+														{
+															ctor: '::',
+															_0: A2(
+																_elm_lang$html$Html$label,
+																{
+																	ctor: '::',
+																	_0: _user$project$Main$radioStyle,
+																	_1: {ctor: '[]'}
+																},
+																{
+																	ctor: '::',
+																	_0: A2(
+																		_elm_lang$html$Html$input,
+																		{
+																			ctor: '::',
+																			_0: _elm_lang$html$Html_Attributes$type_('radio'),
+																			_1: {
+																				ctor: '::',
+																				_0: _elm_lang$html$Html_Attributes$name('control'),
+																				_1: {
+																					ctor: '::',
+																					_0: _elm_lang$html$Html_Events$onClick(
+																						_user$project$Main$ChangeControl(_user$project$Main$Mouse)),
+																					_1: {
+																						ctor: '::',
+																						_0: _elm_lang$html$Html_Attributes$checked(
+																							_elm_lang$core$Native_Utils.eq(model.control, _user$project$Main$Mouse)),
+																						_1: {ctor: '[]'}
+																					}
+																				}
+																			}
+																		},
+																		{ctor: '[]'}),
+																	_1: {
+																		ctor: '::',
+																		_0: _elm_lang$svg$Svg$text('Mouse'),
+																		_1: {ctor: '[]'}
+																	}
+																}),
+															_1: {
+																ctor: '::',
+																_0: A2(
+																	_elm_lang$html$Html$label,
+																	{
+																		ctor: '::',
+																		_0: _user$project$Main$radioStyle,
+																		_1: {ctor: '[]'}
+																	},
+																	{
+																		ctor: '::',
+																		_0: A2(
+																			_elm_lang$html$Html$input,
+																			{
+																				ctor: '::',
+																				_0: _elm_lang$html$Html_Attributes$type_('radio'),
+																				_1: {
+																					ctor: '::',
+																					_0: _elm_lang$html$Html_Attributes$name('control'),
+																					_1: {
+																						ctor: '::',
+																						_0: _elm_lang$html$Html_Events$onClick(
+																							_user$project$Main$ChangeControl(_user$project$Main$Keys)),
+																						_1: {
+																							ctor: '::',
+																							_0: _elm_lang$html$Html_Attributes$checked(
+																								_elm_lang$core$Native_Utils.eq(model.control, _user$project$Main$Keys)),
+																							_1: {ctor: '[]'}
+																						}
+																					}
+																				}
+																			},
+																			{ctor: '[]'}),
+																		_1: {
+																			ctor: '::',
+																			_0: _elm_lang$svg$Svg$text('Keyboard'),
+																			_1: {ctor: '[]'}
+																		}
+																	}),
+																_1: {ctor: '[]'}
+															}
+														}),
+													_1: {ctor: '[]'}
+												}
+											}
 										}
 									}
 								}
@@ -12213,7 +12334,7 @@ var _user$project$Main$update = F2(
 									_elm_lang$core$Native_Utils.update(
 										model,
 										{
-											y: A2(_user$project$Main$bChecky, model.y - _user$project$Main$incNum, model.size)
+											y: A2(_user$project$Main$bChecky, model.y - model.velocity, model.size)
 										})),
 								_1: rand
 							};
@@ -12224,7 +12345,7 @@ var _user$project$Main$update = F2(
 									_elm_lang$core$Native_Utils.update(
 										model,
 										{
-											x: A2(_user$project$Main$bCheckx, model.x - _user$project$Main$incNum, model.size)
+											x: A2(_user$project$Main$bCheckx, model.x - model.velocity, model.size)
 										})),
 								_1: rand
 							};
@@ -12235,7 +12356,7 @@ var _user$project$Main$update = F2(
 									_elm_lang$core$Native_Utils.update(
 										model,
 										{
-											y: A2(_user$project$Main$bChecky, model.y + _user$project$Main$incNum, model.size)
+											y: A2(_user$project$Main$bChecky, model.y + model.velocity, model.size)
 										})),
 								_1: rand
 							};
@@ -12246,7 +12367,7 @@ var _user$project$Main$update = F2(
 									_elm_lang$core$Native_Utils.update(
 										model,
 										{
-											x: A2(_user$project$Main$bCheckx, model.x + _user$project$Main$incNum, model.size)
+											x: A2(_user$project$Main$bCheckx, model.x + model.velocity, model.size)
 										})),
 								_1: rand
 							};
@@ -12257,7 +12378,7 @@ var _user$project$Main$update = F2(
 									_elm_lang$core$Native_Utils.update(
 										model,
 										{
-											y: A2(_user$project$Main$bChecky, model.y - _user$project$Main$incNum, model.size)
+											y: A2(_user$project$Main$bChecky, model.y - model.velocity, model.size)
 										})),
 								_1: rand
 							};
@@ -12268,7 +12389,7 @@ var _user$project$Main$update = F2(
 									_elm_lang$core$Native_Utils.update(
 										model,
 										{
-											x: A2(_user$project$Main$bCheckx, model.x - _user$project$Main$incNum, model.size)
+											x: A2(_user$project$Main$bCheckx, model.x - model.velocity, model.size)
 										})),
 								_1: rand
 							};
@@ -12279,7 +12400,7 @@ var _user$project$Main$update = F2(
 									_elm_lang$core$Native_Utils.update(
 										model,
 										{
-											y: A2(_user$project$Main$bChecky, model.y + _user$project$Main$incNum, model.size)
+											y: A2(_user$project$Main$bChecky, model.y + model.velocity, model.size)
 										})),
 								_1: rand
 							};
@@ -12290,7 +12411,7 @@ var _user$project$Main$update = F2(
 									_elm_lang$core$Native_Utils.update(
 										model,
 										{
-											x: A2(_user$project$Main$bCheckx, model.x + _user$project$Main$incNum, model.size)
+											x: A2(_user$project$Main$bCheckx, model.x + model.velocity, model.size)
 										})),
 								_1: rand
 							};
@@ -12334,7 +12455,7 @@ var _user$project$Main$update = F2(
 						_user$project$Main$mouseSpeed,
 						_user$project$Main$scCenter(model),
 						{ctor: '_Tuple2', _0: model.mx, _1: model.my},
-						2);
+						model.velocity);
 					var dx = _p32._0;
 					var dy = _p32._1;
 					return {
@@ -12428,7 +12549,7 @@ var _user$project$Main$update = F2(
 						{winH: _p37.height, winW: _p37.width}),
 					_1: _elm_lang$core$Platform_Cmd$none
 				};
-			default:
+			case 'RandResult':
 				return (_elm_lang$core$Native_Utils.cmp(
 					_elm_lang$core$List$length(model.feed),
 					rng.limit) < 0) ? {
@@ -12436,6 +12557,17 @@ var _user$project$Main$update = F2(
 					_0: A4(_user$project$Main$genFeed, rng, _p27._0._0, _p27._0._1, model),
 					_1: _elm_lang$core$Platform_Cmd$none
 				} : {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
+			default:
+				var _p38 = _p27._0;
+				return A2(
+					_elm_lang$core$Platform_Cmd_ops['!'],
+					_elm_lang$core$Native_Utils.update(
+						model,
+						{
+							control: _p38,
+							velocity: _elm_lang$core$Native_Utils.eq(_p38, _user$project$Main$Mouse) ? 2 : 10
+						}),
+					{ctor: '[]'});
 		}
 	});
 var _user$project$Main$KeyMsg = function (a) {
@@ -12452,8 +12584,8 @@ var _user$project$Main$subscriptions = function (model) {
 		_0: _elm_lang$mouse$Mouse$moves(_user$project$Main$MouseMsg),
 		_1: {ctor: '[]'}
 	} : {ctor: '[]'};
-	var _p38 = model.inGame;
-	switch (_p38.ctor) {
+	var _p39 = model.inGame;
+	switch (_p39.ctor) {
 		case 'Play':
 			return _elm_lang$core$Platform_Sub$batch(
 				A2(
