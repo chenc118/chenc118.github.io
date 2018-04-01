@@ -85,22 +85,20 @@ init = ({x=(toFloat svWidth)/2,
     }
     , Task.perform UpdateWinSize Window.size)
 
-
+--gets model
 extractMod : (Model, Cmd.Cmd Msg) -> Model
 extractMod (model,_)=model
 
---resets the game model
+--resets the game model, changing inGame state to Pre
 resetGame : Model -> Model
 resetGame model = let 
         initial = extractMod init
 
     in {model | x=initial.x, y = initial.y, feed = initial.feed, size = initial.size,inGame=Pre}
-
+-- pauses game changing inGame state to Pause
 pauseGame : Model -> Model
 pauseGame model = {model | inGame=Pause}
 
-incNum : Float
-incNum = 10
 
 pow : Float -> Int -> Float
 pow x num = case num of
@@ -120,12 +118,39 @@ mouseSpeed (x,y) (ma,mb) speed = let
         dx = ds*(Basics.cos theta)
         dy = ds*(Basics.sin theta)
     in (dx,dy)
+
 --gets center of screen
 scCenter : Model -> (Float,Float)
 scCenter model = let
         x = toFloat model.winW
         y = toFloat model.winH
     in ((x/2),(y/2))
+
+
+
+--methods to compute the view box for the game, centered on the player circle at all times
+genViewBox : Float -> (Float,Float)->Svg.Attribute msg
+genViewBox rad (x,y)= let
+        (vx,vy,vw,vh) = genVBox rad (x,y)
+    in Svg.Attributes.viewBox (vx++" "++vy++" "++vw++" "++vh)
+
+genVBox : Float -> (Float,Float) -> (String,String,String,String)
+genVBox rad (x,y) =let
+        factor = (2*rad)+26
+    in ((x-factor|>toString),(y-factor|>toString),(factor*2|>toString),(factor*2|>toString))
+
+--static ints for the board size
+svWidth : Int 
+svWidth = 1300
+
+svHeight : Int
+svHeight = 600
+
+--compute the radius based on the size
+mr :Float -> Float 
+mr i = Basics.sqrt <| (i/Basics.pi)*2
+
+--boundary check methods 
 {-
 --takes boundary, position
 boundsCheck : Int -> Float ->Float -> Float
@@ -149,29 +174,6 @@ boundsCheck b pos rad = let
                         else 
                             pos
 
-
-
-genViewBox : Float -> (Float,Float)->Svg.Attribute msg
-genViewBox rad (x,y)= let
-        (vx,vy,vw,vh) = genVBox rad (x,y)
-    in Svg.Attributes.viewBox (vx++" "++vy++" "++vw++" "++vh)
-
-genVBox : Float -> (Float,Float) -> (String,String,String,String)
-genVBox rad (x,y) =let
-        factor = (2*rad)+26
-    in ((x-factor|>toString),(y-factor|>toString),(factor*2|>toString),(factor*2|>toString))
-
-svWidth : Int 
-svWidth = 1300
-
-svHeight : Int
-svHeight = 600
-
---compute the radius based on the size
-mr :Float -> Float 
-mr i = Basics.sqrt <| (i/Basics.pi)*2
-
---wrapping
 bCheckx : Float -> Float ->Float
 bCheckx pos size = boundsCheck svWidth pos (mr size)
 
@@ -185,7 +187,7 @@ buildFeeds feed mult = case feed of -- literally just a bunch of tiny circles
                     []      -> []-- return empty list on list end
 
 
-
+-- functions to draw the gray grid lines 
 drawLines : List (Svg.Svg msg)
 drawLines = (drawXLines 10 svHeight 0 svWidth [])++(drawYLines 10 svWidth 0 svHeight [])
 
@@ -210,7 +212,7 @@ drawYLines inc len ly total lines= if ly>total then lines
                                 Svg.Attributes.strokeWidth "1px", 
                                 Svg.Attributes.stroke "lightgrey"][]::lines)
 
---update model consuming feeds that overlap with circle
+--a bunch of methods that update model consuming feeds that overlap with circle
 testConsume: Model -> Model
 testConsume model = let
         feeds = model.feed
@@ -218,10 +220,14 @@ testConsume model = let
         both = wrap consumed feeds --wrap the two together lazily in a tuple
     in {model | feed = List.reverse <|filterOut both [], size = shrink model.velocity <|consume both model.size}--update model
 
+--formula to cause size to decay with time, prevents circle from growing infinitely
 shrink:Float -> Float -> Float
 --shrink size = size - (sqrt ((size-25) /10000000) ) -- basically shrink faster if larger, though at a slower rate, pretty much grow forever like this
 --shrink size = size - (((size*size)-625) / 10000000) --shrink really fast when big, constant gen max ~ 2236 (can get higher if you game it), rng god gen max about 70711
 shrink velocity size = size - ((((size*size)-625)*velocity) / 100000000 ) --shrink really fast when big, constant gen max ~ 2236 (can get higher if you game it), rng god gen max about 70711
+
+
+
 
 --lazy wrapping cause seriously no way to do this kind of thing without going into a bunch of messy case x of and Maybes
 --Also the two lists should be the same size in the usage scenario
@@ -232,34 +238,38 @@ wrap a b = case a of
                        []      -> []
         []      -> []
 
+--removes the feeds that have been consumed
 filterOut : List (Bool,Feed) -> List Feed -> List Feed
 filterOut both feeds = case both of 
         ((True,_)::fs)  -> filterOut fs feeds -- consumed skip that feed item
         ((False,f)::fs) -> filterOut fs (f::feeds) -- merge 
         []              -> feeds
---list of whether can consumeor not > feed list to extract size > current size
+--increases size of model based on consumed feeds
+--list of whether can consume or not > feed list to extract size > current size
 consume: List (Bool,Feed) -> Float -> Float 
 consume feeds size = case feeds of
         ((True,f)::fs)  -> consume fs (size+f.value)
         ((False,_)::fs) -> consume fs size
         []              -> size
 
--- ints are radius and position
+--tests each feed to see if it's within range of the player circle
+-- floats are radius and position
 canConsume: Float -> Float -> Float -> Feed -> Bool
 canConsume r x y f= let
             distance = Basics.sqrt ((((toFloat f.x)-x)*((toFloat f.x)-x))+(((toFloat f.y)-y)*((toFloat f.y)-y)))
         in (distance<r + (mr f.value))
 
-
+--stuff dealing with generating a feed in a new position
 genFeed: RNG -> Int -> Int -> Model -> Model
 genFeed rng a b model = if a<=rng.regChance
             then {model | feed = addFeed model.feed 5 (b%svWidth) (round <| toFloat b/(toFloat svWidth))} 
             else if a<=rng.regChance+rng.superChance then {model | feed = addFeed model.feed 10 (b%svWidth) (round<| toFloat b/(toFloat svWidth))}
             else model -- only gen on rand = 1
+--adds feed to list
 addFeed: FeedBit -> Float -> Int -> Int -> FeedBit
 addFeed f v x y = {x=x, y=y,value=v,color=genColor (x+y)}::f
 
---semi random based on position
+--semi random color based on position
 genColor : Int -> String
 genColor x = let 
             y= x%14 --change to suit colors
@@ -280,6 +290,7 @@ genColor x = let
                 12 -> "brown"
                 _ -> "white" -- the devil's dot, aka it can't be seen
 
+{-Computes the frame rate by averaging time taken for every 20 ticks-}
 tick : Float -> Model -> Model
 tick tick model = let
         frames = model.tickFrames 
@@ -290,12 +301,13 @@ tick tick model = let
             {model | tickRate = 20000 / (tick-frames.first), tickFrames = {frames | count=0}}
         else 
             {model | tickFrames = {frames | count=frames.count+1}}
-
+-- updates what is displayed in the circle
 updatePlayerDisplay: DUpdate -> Display
 updatePlayerDisplay du = case du of 
                     (LS s) -> LS s
                     (RS s) -> RS {source=s}
 
+-- entering/ escaping pause menu when in game
 escKey model =  case model.inGame of
                         Pause -> ({model|inGame = Play}, Cmd.none)
                         Play  -> ({model|inGame = Pause},Cmd.none)
@@ -347,7 +359,10 @@ update msg model = let
             (RandResult (a,b)) -> if (List.length model.feed < rng.limit)  --limit so there's an upper bound to the size, over 1000 it starts getting slow
                                 then (genFeed rng a b model,Cmd.none) 
                                 else (model,Cmd.none)
-            (ChangeControl c) -> {model | control=c, velocity = if c==Mouse then 2 else 10}![] --framework to adjust game speed
+            (ChangeControl c) -> let 
+                                mRNG = model.rng
+                                nRNG =  {mRNG|range= if c==Mouse then 50 else 10}
+                            in {model | control=c, velocity = if c==Mouse then 2 else 10, rng= nRNG}![] --framework to adjust game speed
             --_ -> (model,Cmd.none)
 
 --genRand : RNG -> Cmd.Cmd Msg﻿
@@ -410,7 +425,7 @@ gameView model =
                 
                 strong[][Html.text ("FPS: "++(toString <|round<| model.tickRate))]
                 ]
-            ,div[Html.Attributes.hidden (not model.minimap), Html.Attributes.style [("position","fixed"),("bottom","1%"),("right","1%"),("height","10%"),("width","10%")]][
+            ,div[Html.Attributes.hidden (not model.minimap), Html.Attributes.style [("position","fixed"),("bottom","10px"),("right","10px"),("height","15%"),("width","15%")]][
                 Svg.svg[Svg.Attributes.viewBox ("0 0 "++(toString svWidth)++" "++(toString svHeight))]([
                     Svg.rect[Svg.Attributes.x "0"
                         ,Svg.Attributes.y "0"
@@ -429,24 +444,6 @@ gameView model =
         ]
 
 
-
-radioStyle = Html.Attributes.style[("clear","both"),("margin","auto"),("text-align","unset")]
-
-radioButton : String -> String -> String ->  Html Msg
-radioButton color current display= label[radioStyle][
-            input[Html.Attributes.checked (color==current)
-                ,Html.Attributes.type_ "radio"
-                ,Html.Attributes.name "colorPick"
-                ,onClick (DispUpdate (LS color))][]
-            ,Html.text display
-        ]
-
---welcome to styling mess needed in order to make the actual thing look a lot more clean
---partly copied from agar.io the style for the text boxes
-textStyle = Html.Attributes.style [("border","1px solid #ccc")
-                                ,("box-shadow","inset 0 1px 1px rgba(0,0,0,.075)")
-                                ,("transition","border-color ease-in-out .15s,box-shadow ease-in-out .15s;")
-                                ,("border-radius","4px")]
 --used for the buttons you can click when paused
 pButtonStyle = Html.Attributes.style pButtonStyleList
 pButtonStyleList = [("display","block")
@@ -488,6 +485,24 @@ pauseView model = div [Html.Attributes.style[("display","flex")
                         ]
                     ]
                     
+
+
+radioStyle = Html.Attributes.style[("clear","both"),("margin","auto"),("text-align","unset")]
+
+radioButton : String -> String -> String ->  Html Msg
+radioButton color current display= label[radioStyle][
+            input[Html.Attributes.checked (color==current)
+                ,Html.Attributes.type_ "radio"
+                ,Html.Attributes.name "colorPick"
+                ,onClick (DispUpdate (LS color))][]
+            ,Html.text display
+        ]
+
+--partly copied from agar.io the style for the text boxes
+textStyle = Html.Attributes.style [("border","1px solid #ccc")
+                                ,("box-shadow","inset 0 1px 1px rgba(0,0,0,.075)")
+                                ,("transition","border-color ease-in-out .15s,box-shadow ease-in-out .15s;")
+                                ,("border-radius","4px")]
 
 preView : Model -> Html Msg
 preView model = 

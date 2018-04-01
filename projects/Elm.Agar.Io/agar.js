@@ -10371,6 +10371,38 @@ var _jinjor$elm_inline_hover$InlineHover$hover = F4(
 			children);
 	});
 
+var _user$project$Main$textStyle = _elm_lang$html$Html_Attributes$style(
+	{
+		ctor: '::',
+		_0: {ctor: '_Tuple2', _0: 'border', _1: '1px solid #ccc'},
+		_1: {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'box-shadow', _1: 'inset 0 1px 1px rgba(0,0,0,.075)'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'transition', _1: 'border-color ease-in-out .15s,box-shadow ease-in-out .15s;'},
+				_1: {
+					ctor: '::',
+					_0: {ctor: '_Tuple2', _0: 'border-radius', _1: '4px'},
+					_1: {ctor: '[]'}
+				}
+			}
+		}
+	});
+var _user$project$Main$radioStyle = _elm_lang$html$Html_Attributes$style(
+	{
+		ctor: '::',
+		_0: {ctor: '_Tuple2', _0: 'clear', _1: 'both'},
+		_1: {
+			ctor: '::',
+			_0: {ctor: '_Tuple2', _0: 'margin', _1: 'auto'},
+			_1: {
+				ctor: '::',
+				_0: {ctor: '_Tuple2', _0: 'text-align', _1: 'unset'},
+				_1: {ctor: '[]'}
+			}
+		}
+	});
 var _user$project$Main$pButtonHover = _jinjor$elm_inline_hover$InlineHover$hover(
 	{
 		ctor: '::',
@@ -10431,38 +10463,6 @@ var _user$project$Main$pButtonStyleList = {
 	}
 };
 var _user$project$Main$pButtonStyle = _elm_lang$html$Html_Attributes$style(_user$project$Main$pButtonStyleList);
-var _user$project$Main$textStyle = _elm_lang$html$Html_Attributes$style(
-	{
-		ctor: '::',
-		_0: {ctor: '_Tuple2', _0: 'border', _1: '1px solid #ccc'},
-		_1: {
-			ctor: '::',
-			_0: {ctor: '_Tuple2', _0: 'box-shadow', _1: 'inset 0 1px 1px rgba(0,0,0,.075)'},
-			_1: {
-				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: 'transition', _1: 'border-color ease-in-out .15s,box-shadow ease-in-out .15s;'},
-				_1: {
-					ctor: '::',
-					_0: {ctor: '_Tuple2', _0: 'border-radius', _1: '4px'},
-					_1: {ctor: '[]'}
-				}
-			}
-		}
-	});
-var _user$project$Main$radioStyle = _elm_lang$html$Html_Attributes$style(
-	{
-		ctor: '::',
-		_0: {ctor: '_Tuple2', _0: 'clear', _1: 'both'},
-		_1: {
-			ctor: '::',
-			_0: {ctor: '_Tuple2', _0: 'margin', _1: 'auto'},
-			_1: {
-				ctor: '::',
-				_0: {ctor: '_Tuple2', _0: 'text-align', _1: 'unset'},
-				_1: {ctor: '[]'}
-			}
-		}
-	});
 var _user$project$Main$tick = F2(
 	function (tick, model) {
 		var frames = model.tickFrames;
@@ -10714,6 +10714,11 @@ var _user$project$Main$drawXLines = F5(
 			}
 		}
 	});
+var _user$project$Main$boundsCheck = F3(
+	function (b, pos, rad) {
+		var bounds = _elm_lang$core$Basics$toFloat(b);
+		return (_elm_lang$core$Native_Utils.cmp(pos, bounds) > 0) ? bounds : ((_elm_lang$core$Native_Utils.cmp(pos, 0) < 0) ? 0 : pos);
+	});
 var _user$project$Main$mr = function (i) {
 	return _elm_lang$core$Basics$sqrt((i / _elm_lang$core$Basics$pi) * 2);
 };
@@ -10788,7 +10793,23 @@ var _user$project$Main$testConsume = function (model) {
 		});
 };
 var _user$project$Main$svHeight = 600;
+var _user$project$Main$bChecky = F2(
+	function (pos, size) {
+		return A3(
+			_user$project$Main$boundsCheck,
+			_user$project$Main$svHeight,
+			pos,
+			_user$project$Main$mr(size));
+	});
 var _user$project$Main$svWidth = 1300;
+var _user$project$Main$bCheckx = F2(
+	function (pos, size) {
+		return A3(
+			_user$project$Main$boundsCheck,
+			_user$project$Main$svWidth,
+			pos,
+			_user$project$Main$mr(size));
+	});
 var _user$project$Main$drawLines = A2(
 	_elm_lang$core$Basics_ops['++'],
 	A5(
@@ -10870,27 +10891,6 @@ var _user$project$Main$genViewBox = F2(
 								vw,
 								A2(_elm_lang$core$Basics_ops['++'], ' ', vh)))))));
 	});
-var _user$project$Main$boundsCheck = F3(
-	function (b, pos, rad) {
-		var bounds = _elm_lang$core$Basics$toFloat(b);
-		return (_elm_lang$core$Native_Utils.cmp(pos, bounds) > 0) ? bounds : ((_elm_lang$core$Native_Utils.cmp(pos, 0) < 0) ? 0 : pos);
-	});
-var _user$project$Main$bCheckx = F2(
-	function (pos, size) {
-		return A3(
-			_user$project$Main$boundsCheck,
-			_user$project$Main$svWidth,
-			pos,
-			_user$project$Main$mr(size));
-	});
-var _user$project$Main$bChecky = F2(
-	function (pos, size) {
-		return A3(
-			_user$project$Main$boundsCheck,
-			_user$project$Main$svHeight,
-			pos,
-			_user$project$Main$mr(size));
-	});
 var _user$project$Main$scCenter = function (model) {
 	var y = _elm_lang$core$Basics$toFloat(model.winH);
 	var x = _elm_lang$core$Basics$toFloat(model.winW);
@@ -10921,7 +10921,6 @@ var _user$project$Main$mouseSpeed = F3(
 		var dy = ds * _elm_lang$core$Basics$sin(theta);
 		return {ctor: '_Tuple2', _0: dx, _1: dy};
 	});
-var _user$project$Main$incNum = 10;
 var _user$project$Main$extractMod = function (_p17) {
 	var _p18 = _p17;
 	return _p18._0;
@@ -11624,16 +11623,16 @@ var _user$project$Main$gameView = function (model) {
 													_0: {ctor: '_Tuple2', _0: 'position', _1: 'fixed'},
 													_1: {
 														ctor: '::',
-														_0: {ctor: '_Tuple2', _0: 'bottom', _1: '1%'},
+														_0: {ctor: '_Tuple2', _0: 'bottom', _1: '10px'},
 														_1: {
 															ctor: '::',
-															_0: {ctor: '_Tuple2', _0: 'right', _1: '1%'},
+															_0: {ctor: '_Tuple2', _0: 'right', _1: '10px'},
 															_1: {
 																ctor: '::',
-																_0: {ctor: '_Tuple2', _0: 'height', _1: '10%'},
+																_0: {ctor: '_Tuple2', _0: 'height', _1: '15%'},
 																_1: {
 																	ctor: '::',
-																	_0: {ctor: '_Tuple2', _0: 'width', _1: '10%'},
+																	_0: {ctor: '_Tuple2', _0: 'width', _1: '15%'},
 																	_1: {ctor: '[]'}
 																}
 															}
@@ -12559,13 +12558,20 @@ var _user$project$Main$update = F2(
 				} : {ctor: '_Tuple2', _0: model, _1: _elm_lang$core$Platform_Cmd$none};
 			default:
 				var _p38 = _p27._0;
+				var mRNG = model.rng;
+				var nRNG = _elm_lang$core$Native_Utils.update(
+					mRNG,
+					{
+						range: _elm_lang$core$Native_Utils.eq(_p38, _user$project$Main$Mouse) ? 50 : 10
+					});
 				return A2(
 					_elm_lang$core$Platform_Cmd_ops['!'],
 					_elm_lang$core$Native_Utils.update(
 						model,
 						{
 							control: _p38,
-							velocity: _elm_lang$core$Native_Utils.eq(_p38, _user$project$Main$Mouse) ? 2 : 10
+							velocity: _elm_lang$core$Native_Utils.eq(_p38, _user$project$Main$Mouse) ? 2 : 10,
+							rng: nRNG
 						}),
 					{ctor: '[]'});
 		}
